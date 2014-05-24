@@ -41,7 +41,7 @@ RT_PROGRAM void any_hit_shadow()
 		
 	}
 	*/
-	prd_shadow.attenuation = make_float3(0);
+	prd_shadow.contribution = make_float3(0.0f);
 	rtTerminateRay();
   
 }
@@ -78,11 +78,11 @@ RT_PROGRAM void generic_material()
 		if(ndl > 0.0f){
 			// cast shadow ray
 			PerRayData_shadow shadow_prd;
-			shadow_prd.attenuation = make_float3(1.0f);
+			shadow_prd.contribution = make_float3(1.0f);
 			float ldist = length(light.pos - hit);
 			optix::Ray shadow_ray( hit, l, shadow_ray_type, scene_epsilon, ldist);
 			rtTrace(top_object, shadow_ray, shadow_prd);
-			float3 light_attenuation = shadow_prd.attenuation;
+			float3 light_attenuation = shadow_prd.contribution;
 
 			if( fmaxf(light_attenuation) > 0.0f ){
 				directLight = ndl*light.color;

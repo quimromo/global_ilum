@@ -82,10 +82,18 @@ public:
 		m_context["shadow_ray_type"]->setUint(1);
 		m_context["scene_epsilon"]->setFloat( 1.e-4f );
 		
-
+		/*
 		optix::Variable output_buffer = m_context["output_buffer"];
 		optix::Buffer buffer = m_context->createBuffer( RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT3, max_block_size_x* max_block_size_y );
 		output_buffer->set(buffer);
+		*/
+		optix::Variable cumulated_buffer = m_context["cumulated_buffer"];
+		optix::Buffer buffer_cumul = m_context->createBuffer( RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT3, width*height);
+		cumulated_buffer->set(buffer_cumul);
+		
+		optix::Variable output_buffer = m_context["output_buffer"];
+		optix::Buffer buffer_out = m_context->createBuffer( RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT3, width*height);
+		output_buffer->set(buffer_out);
 
 		// Ray generation program
 		
@@ -196,9 +204,10 @@ public:
 						unsigned block_size_x = width/blocks_x;
 						unsigned offset_x = block_size_x * block_x;  
 						if (block_x == blocks_x - 1)block_size_x += width%blocks_x;	
+						/*
 						std::cout << "OFFSET:" << offset_x << " " << offset_y << std::endl;
 						std::cout << "BLOCK_SIZE:" << block_size_x << " " << block_size_y << std::endl;
-
+						*/
 						float rnd1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 						float rnd2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 						
@@ -214,7 +223,7 @@ public:
 						m_context->compile();
 						m_context->launch( 0, block_size_x, block_size_y );
 						//m_context->la
-						float* buf = static_cast<float*>( m_context["output_buffer"]->getBuffer()->map());
+						
 						
 						/*for(int p = 0; p < width * height; p++){
 								image[3*p] += (float)*(buf + 3*p);
@@ -223,7 +232,7 @@ public:
 						
 						}*/
 
-						
+						/*
 						for(int x = offset_x; x < offset_x + block_size_x; ++x){
 							for(int y = offset_y;  y < offset_y + block_size_y; ++y){
 								int p = y * width + x;
@@ -238,19 +247,21 @@ public:
 								render_image[3*p + 2] = image[3*p + 2] / static_cast<float>(currentSample + 1);
 							}
 						}
-						glClearColor ( 0.0, 1.0, 0.0, 1.0 );
-						glClear ( GL_COLOR_BUFFER_BIT );
-						
-						glDrawPixels(width, height, GL_RGB, GL_FLOAT, &render_image[0]);
-						SDL_GL_SwapWindow(window);
+						*/
 						SDL_Event event;
 						SDL_PollEvent(&event);
-						
-						m_context["output_buffer"]->getBuffer()->unmap();
+				
 					}
 				}
+				float* buf = static_cast<float*>( m_context["output_buffer"]->getBuffer()->map());
+				glClearColor ( 0.0, 1.0, 0.0, 1.0 );
+				glClear ( GL_COLOR_BUFFER_BIT );
+						
+				glDrawPixels(width, height, GL_RGB, GL_FLOAT, buf /*&render_image[0]*/);
+				SDL_GL_SwapWindow(window);		
+				m_context["output_buffer"]->getBuffer()->unmap();
 				std::cout << static_cast<float>((currentSample + 1) * 100) / static_cast<float>(spp * spp);
-						std::cout << "% completado" << std::endl; 
+				std::cout << "% completado" << std::endl; 
 			}
 			/*
 			for(unsigned int p = 0; p < width * height; ++p){
@@ -274,11 +285,13 @@ public:
 		Uint w = width;
 		Uint h = height;
 		std::vector<unsigned char> pixels(width * height * 3, 0);
+		
+		float* buf = static_cast<float*>( m_context["output_buffer"]->getBuffer()->map());
 
 		for(unsigned int p = 0; p < width * height; ++p){
-			pixels[3*p] = static_cast<unsigned char>(saturate(render_image[3*p]) * 255.99);
-			pixels[3*p + 1] = static_cast<unsigned char>(saturate(render_image[3*p + 1]) * 255.99);
-			pixels[3*p + 2] = static_cast<unsigned char>(saturate(render_image[3*p + 2]) * 255.99);
+			pixels[3*p] = static_cast<unsigned char>(saturate(buf[3*p]) * 255.99);
+			pixels[3*p + 1] = static_cast<unsigned char>(saturate(buf[3*p + 1]) * 255.99);
+			pixels[3*p + 2] = static_cast<unsigned char>(saturate(buf[3*p + 2]) * 255.99);
 		}
 
 		unsigned char tgah[18];
@@ -658,9 +671,16 @@ public:
 		*/
 		GeometryGroup group = m_context->createGeometryGroup();
 		Program diffuse_prg = m_context->createProgramFromPTXFile( ptxpath("gi_project", "m_obj_material.cu") , "diffuse" );
+		Program any_hit = m_context->createProgramFromPTXFile( ptxpath("gi_project", "m_obj_material.cu") , "any_hit_shadow" );
 		Material diffuse = m_context->createMaterial();
+		diffuse["is_dome"]->setInt(true);
+		diffuse["dome_emission"]->setFloat(1.0f, 1.0f, 1.0f);
+		diffuse["max_direct_samples"]->setUint(10u);
+		diffuse["min_direct_samples"]->setUint(1u);
 		diffuse->setClosestHitProgram(0, diffuse_prg);
+		diffuse->setAnyHitProgram(1, any_hit); 
 		std::string filename = "assets/dabrovic-sponza/sponza.obj";
+		
 		if( ObjLoader::isMyFile( filename.c_str() ) ) {
 			std::cout << "test" << std::endl;
 			const char* path = "m_triangle_mesh.cu.obj";
@@ -692,6 +712,7 @@ public:
 		sphere["center"]->setFloat(0.0f, 0.0f, 0.0f);
 		sphere["radius"]->setFloat(50.0f);
 
+		/*
 		Geometry sphere2 = m_context->createGeometry();
 		sphere2->setPrimitiveCount(1u);
 		sphere2->setBoundingBoxProgram(sphere_bounds);
@@ -733,7 +754,7 @@ public:
 		spec3["Kd"]->setFloat(0.5, 0.2, 0.2);
 		spec3["Ks"]->setFloat(0.4, 0.2, 0.2);
 		spec3["phong_exp"]->setFloat(30.0);
-
+		
 		GeometryInstance ball1 = m_context->createGeometryInstance(sphere2, &spec1, &spec1+1);
 		GeometryInstance ball2 = m_context->createGeometryInstance(sphere3, &spec2, &spec2+1);
 		GeometryInstance ball3 = m_context->createGeometryInstance(sphere4, &spec3, &spec3+1);
@@ -743,11 +764,12 @@ public:
 		specular_balls->setChild(1, ball2);
 		specular_balls->setChild(2, ball3);
 		specular_balls->setAcceleration(m_context->createAcceleration("NoAccel", "NoAccel"));
+		*/
 
 		Material diffuse_light = m_context->createMaterial();
 		Program diffuse_em = m_context->createProgramFromPTXFile( ptxpath("gi_project", "m_obj_material.cu") , "emitter" );
 		diffuse_light->setClosestHitProgram( 0, diffuse_em );
-		diffuse_light["emission"]->setFloat(2.0, 2.0, 2.0);
+		diffuse_light["emission"]->setFloat(1.0, 1.0, 1.0);
 		GeometryInstance light = m_context->createGeometryInstance(sphere, &diffuse_light, &diffuse_light+1);
 		GeometryGroup light_group = m_context->createGeometryGroup();
 		light_group->setChildCount(1);
@@ -756,11 +778,11 @@ public:
 		light_group->setAcceleration(m_context->createAcceleration("NoAccel", "NoAccel"));
 		Group all = m_context->createGroup();
 		all->setAcceleration(m_context->createAcceleration("Sbvh", "Bvh"));
-		all->setChildCount(3);
+		all->setChildCount(2);
 		all->setChild(0, group);
 		all->setChild(1, light_group);
-		all->setChild(2, specular_balls);
-		
+		//all->setChild(2, specular_balls);
+		m_context["top_shadower"]->set(group);
 		m_context["top_object"]->set(all);
 
 	}
@@ -785,7 +807,7 @@ int main(int argc, char* argv[]){
 	SDL_GLContext maincontext;
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	maincontext = SDL_GL_CreateContext(window);
-	unsigned int sqrtspp = 8;
+	unsigned int sqrtspp = 15;
 	Pathtracer pt;
 	pt.init(width, height, sqrtspp, 100u);
 	pt.createObjGeometry();

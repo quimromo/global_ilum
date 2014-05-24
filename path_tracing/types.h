@@ -1,6 +1,6 @@
 
 
-#define PI		3.14159265f;
+#define PI		3.14159265f
 #include <optix.h>
 #include <optix_math.h>
 
@@ -12,11 +12,13 @@ struct PerRayData_radiance
   int depth;
   unsigned int seed;
   unsigned int dist;
+  bool is_light;
+  float3 contribution;
 };
 
 struct PerRayData_shadow
 {
-  float3 attenuation;
+  float3 contribution;
 };
 
 /*
@@ -78,5 +80,6 @@ static __device__ __inline__ float3 sample_specular(float phong_exp, float rnd1,
 
 	return make_float3(x,y,z);
 
-
 }
+
+//static __device__ __inline__ float solidAngleSubtendedByPoligon(

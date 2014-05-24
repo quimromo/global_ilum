@@ -47,6 +47,7 @@ rtDeclareVariable(float3,        W, , );
 rtDeclareVariable(float3,        bad_color, , );
 rtDeclareVariable(float,         scene_epsilon, , );
 rtBuffer<float3, 1>              output_buffer;
+rtBuffer<float3, 1>              cumulated_buffer;
 rtDeclareVariable(rtObject,      top_object, , );
 rtDeclareVariable(unsigned int,  radiance_ray_type, , );
 
@@ -80,6 +81,7 @@ RT_PROGRAM void m_pinhole_camera()
   optix::Ray ray = optix::make_Ray(ray_origin, ray_direction, radiance_ray_type, scene_epsilon, RT_DEFAULT_MAX);
 
   PerRayData_radiance prd;
+  prd.contribution = make_float3(1.0f);
   prd.importance = 1.f;
   prd.depth = 0;
   prd.seed = tea<32>((launch_index.x + offset_x) * (launch_index.y + offset_y) + (int)clock(), currentSample + (int) clock());  
@@ -94,12 +96,23 @@ RT_PROGRAM void m_pinhole_camera()
 #else
   //output_buffer[launch_index] = make_color( prd.result );
   
-  
+  /*
   output_buffer[launch_index.y* output_buffer_size.x + launch_index.x] = make_float3 (	prd.result.z,
 												prd.result.y,
 												prd.result.x
 											);
+*/
+  unsigned int buff_idx = (launch_index.y + offset_y)* screen_dim.x + launch_index.x + offset_x;
+  if(currentSample == 0){
+	  cumulated_buffer[buff_idx] = make_float3(0.0f);
+  }
+  cumulated_buffer[buff_idx] += make_float3( prd.result.z, prd.result.y, prd.result.x );
 	
+  float3 render_color = cumulated_buffer[buff_idx] / (currentSample + 1u);
+  output_buffer[buff_idx] = make_float3 (	__saturatef(render_color.z),
+											__saturatef(render_color.y ),
+											__saturatef(render_color.x )
+										);
   /*
   output_buffer[launch_index] = make_float3 (	__saturatef(prd.result.z),
 												__saturatef(prd.result.y ),
