@@ -1,0 +1,129 @@
+\documentclass[12pt, a4paper,twoside]{tesi_upf}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[cam,a4,center,frame]{crop}
+\usepackage{graphicx}
+\usepackage{times}
+\usepackage{url}
+%\usepackage{garamond}
+\pagestyle{plain}
+
+\usepackage{makeidx}
+\makeindex
+
+%BIBLIOGRAPHY STYLE
+\bibliographystyle{vancouver}
+
+
+%LANGUAGE
+\selectlanguage{spanish}
+
+\addto\captionsspanish
+  {\renewcommand{\contentsname}{\Large \sffamily Índice}}
+
+
+%YOUR INFORMATION HERE:
+
+\title{Trazado de rayos estocástico en la GPU}
+\subtitle{}
+\author{Joaquim Romo}
+\thyear{2014}
+\department{GTI}
+\supervisor{Javier Agenjo}
+
+\includeonly{
+	content/1_Introduccion,
+	content/2_Fundamentos,
+	content/3-ResearchObjectives,
+	content/4-ResearchPlanAndMethodology,
+	content/5-SummaryOfPriorWork,
+	content/6-Significance
+}
+
+\begin{document}
+
+
+\frontmatter
+
+\maketitle
+
+\cleardoublepage
+
+
+
+
+\selectlanguage{spanish}
+\section*{\Large \sffamily Resumen}
+
+El presente trabajo tiene como objetivo el estudio y la implementación de un algoritmo de renderizado con raytracing estocástico en la unidad de procesamiento de gráficos (GPU).
+Se ha elegido realizar la implementación en una arquitectura de este tipo debido a las ventajas que ofrece en cuanto a tiempo de ejecución, gracias a la gran capacidad de cómputo en paralelo que ofrecen las arquitecturas de GPU actuales.
+
+
+La primera parte del trabajo se dedica al estudio teórico del algoritmo de pathtracing, se comentan algunos conceptos físicos básicos relacionados con el transporte de luz y su interacción con los materiales así como las ecuaciones matemáticas y las técnicas estadísticas necesarias para la comprensión y correcta implementación del algoritmo.
+
+
+En una segunda parte se discuten las tecnologías involucradas, concretamente el uso que se hace de la arquitectura CUDA, la librería OptiX y su funcionamiento y la implementación del algoritmo que se ha realizado sobre estas.  
+
+%DIFFERENT TABLES OF CONTENT:
+
+\tableofcontents
+\listoffigures
+
+\addcontentsline{toc}{chapter}{Index of figures}
+\listoftables
+
+\addcontentsline{toc}{chapter}{Index of tables}
+
+\cleardoublepage
+
+%HERE STARTS THE TEXT:
+\mainmatter
+\include{content/1_Introduccion}
+
+\include{content/2_Fundamentos}
+
+\include{content/3-ResearchObjectives}
+
+\include{content/4-ResearchPlanAndMethodology}
+
+\include{content/5-SummaryOfPriorWork}
+
+\include{content/6-Significance}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+%\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{bib/library}
+
+
+
+\backmatter
+\printindex
+
+
+
+
+
+\end{document}
+
+
+%DO NOT CHANGE THIS PART OF THE DOCUMENT
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyfoot[RO]{\thepage}
+\fancyfoot[LE]{\thepage}
+
+
+
+\usepackage{multind}
+\makeindex{authors}
+
+\index{authors}{Einstein}
+
+\printindex{authors}{Author index}

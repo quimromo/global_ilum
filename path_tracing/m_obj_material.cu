@@ -60,6 +60,8 @@ rtDeclareVariable(float3, dome_emission, , );
 rtDeclareVariable(unsigned int, max_direct_samples, , );
 rtDeclareVariable(unsigned int, min_direct_samples, , );
 
+rtBuffer<SphereLight, 1> spherical_lights;
+
 
 RT_PROGRAM void any_hit_shadow()
 {
@@ -107,53 +109,7 @@ RT_PROGRAM void diffuse()
 	float3 brdfLight = make_float3(0.0);
 	float3 hit = ray.origin + ray.direction * t_hit;
 	
-	if(true){
-		float contrib = (prd_radiance.contribution.x + prd_radiance.contribution.y + prd_radiance.contribution.z) / 3.0f;
-		unsigned int num_samples = (unsigned int)fmaxf(contrib * (float)max_direct_samples, (float)min_direct_samples);
-		unsigned int num_samples = 20u;
-		for(unsigned int i = 0; i < num_samples; ++i){
-			unsigned int seed = prd_radiance.seed;
-			float r1 = rnd(seed);
-			float r2 = rnd(seed);
-			float3 p;
-			//cosine_sample_hemisphere(r1, r2, p);
-			//p = sampleHemisphere(r1, r2);
-			float z = 1.0f - 2.0f * r1;
-			float r = sqrtf( fmaxf( 0.0f, 1.0f - z*z) );
-			float phi = 2.0f * r2 * PI;
-			float x = r * cos(phi);
-			float y = r * sin(phi);
- 
-			p = normalize( make_float3(x, y, z ) );
-			float pdf = 1.0f / (4.0f * PI);
-			
-			/* sample solid angle
-			float theta = 2.0f * PI;
-			float phi = 2.0f * PI * r1;
-			float alpha = acos( 1 - (1- cosf(theta) ) * r2 );
-			float x = sin(alpha)*cosf(phi);
-			float y = sin(alpha)*sinf(phi);
-			float z = -cos(alpha);
-			p = make_float3(x, y, z);
-			*/
-
-			float3 v1, v2;
-			createONB(ffnormal, v1, v2);
-			float3 rd = normalize(v1 * p.x + v2 * p.y + ffnormal * p.z);
-			if(dot(rd, ffnormal) < 0.0f) rd *= -1;
-			PerRayData_shadow shadow_prd;
-			shadow_prd.contribution = make_float3(1.0f);
-			Ray shadow_ray = Ray( hit, rd, shadow_ray_type, scene_epsilon);
-			rtTrace(top_object, shadow_ray, shadow_prd);
-			color +=  shadow_prd.contribution * dot(rd, ffnormal);
-
-		}
-		color *= Kd * 2.0f * PI * dome_emission;
-		color /= num_samples;
-
-
-	}
-	
+	bool hit_light = false;
 	if(prd_radiance.depth < max_depth){
 		unsigned int seed = prd_radiance.seed;
 		float r1 = rnd(seed);
@@ -171,11 +127,80 @@ RT_PROGRAM void diffuse()
 		diffuse_refl_prd.seed = seed;
 		diffuse_refl_prd.depth = prd_radiance.depth + 1;
 		diffuse_refl_prd.contribution *= Kd;
+		diffuse_refl_prd.is_light = false;
 		optix::Ray diffuse_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
 		rtTrace(top_object, diffuse_refl_ray, diffuse_refl_prd);
 		brdfLight = diffuse_refl_prd.result;// * dot(norm, rd);
 		color += brdfLight * Kd;// / diffuse_refl_prd.dist;// * diffuse_refl_prd.dist); // * dot(ffnormal, rd);// / (diffuse_refl_prd.dist*diffuse_refl_prd.dist);
+		hit_light = diffuse_refl_prd.is_light;
 	}
+
+	if(!hit_light){
+
+		if(is_dome){
+			float3 direct_color = make_float3(0.0);
+			float contrib = (prd_radiance.contribution.x + prd_radiance.contribution.y + prd_radiance.contribution.z) / 3.0f;
+			unsigned int num_samples = (unsigned int)fmaxf(contrib * (float)max_direct_samples, (float)min_direct_samples);
+			//unsigned int num_samples = 20u;
+			for(unsigned int i = 0; i < num_samples; ++i){
+				unsigned int seed = prd_radiance.seed;
+				float r1 = rnd(seed);
+				float r2 = rnd(seed);
+				float3 p;
+				//cosine_sample_hemisphere(r1, r2, p);
+				//p = sampleHemisphere(r1, r2);
+				float z = 1.0f - 2.0f * r1;
+				float r = sqrtf( fmaxf( 0.0f, 1.0f - z*z) );
+				float phi = 2.0f * r2 * PI;
+				float x = r * cos(phi);
+				float y = r * sin(phi);
+ 
+				p = normalize( make_float3(x, y, z ) );
+				float pdf = 1.0f / (4.0f * PI);
+			
+				/* sample solid angle
+				float theta = 2.0f * PI;
+				float phi = 2.0f * PI * r1;
+				float alpha = acos( 1 - (1- cosf(theta) ) * r2 );
+				float x = sin(alpha)*cosf(phi);
+				float y = sin(alpha)*sinf(phi);
+				float z = -cos(alpha);
+				p = make_float3(x, y, z);
+				*/
+
+				float3 v1, v2;
+				createONB(ffnormal, v1, v2);
+				float3 rd = normalize(v1 * p.x + v2 * p.y + ffnormal * p.z);
+				if(dot(rd, ffnormal) < 0.0f) rd *= -1;
+				PerRayData_shadow shadow_prd;
+				shadow_prd.contribution = make_float3(1.0f);
+				Ray shadow_ray = Ray( hit, rd, shadow_ray_type, scene_epsilon);
+				rtTrace(top_object, shadow_ray, shadow_prd);
+				direct_color +=  shadow_prd.contribution * dot(rd, ffnormal);
+
+			}
+			direct_color *= Kd * 2.0f * PI * dome_emission;
+			direct_color /= num_samples;
+			color += direct_color;
+		}
+
+		for(int i = 0; i < spherical_lights.size(); ++i){
+			float3 light_dir = spherical_lights[i] - hit;
+			float dist2 = dot(light_dir, light_dir);
+			float radius2 = spherical_lights[i].radius * spherical_lights[i].radius;
+			if(dist2 - radius2 < scene_epsilon){
+				continue;
+			}
+			float cos_theta_max = sqrtf(1 - radius2/dist2);
+			float pdf = 1.0f / (2.0f * PI * (1.0f - cos_theta_max));
+
+
+
+		}
+
+
+	}
+
 	prd_radiance.result = color;
 	//prd_radiance.dist = fabs(t_hit) / 10.0f;
   
@@ -196,7 +221,7 @@ RT_PROGRAM void emitter(){
 
 		prd_radiance.result = emission;// * LnDL;
 		//prd_radiance.dist = t_hit/10.0f;
-		//prd_radiance.is_light = true;
+		prd_radiance.is_light = true;
 	//}
 	//else prd_radiance.result = make_float3(0.0f);
 	

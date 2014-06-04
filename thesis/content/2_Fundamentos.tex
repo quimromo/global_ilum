@@ -1,0 +1,49 @@
+\chapter{Fundamentos teóricos}
+
+\section{Unidades Radiométricas}
+
+\subsection{Flujo}
+
+\subsection{Irradiancia}
+
+\subsection{Angulo solido}
+
+\subsection{Radiancia}
+
+\clearpage
+
+\section{BRDF}
+
+La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada
+
+\begin{equation}
+f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} 
+\end{equation}
+
+donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
+
+La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
+
+\clearpage
+
+\section{Ecuación de renderizado}
+
+James T. Kajiya (1986) propuso una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
+
+Esta ecuación se puede encontrar en muchas formas distintas según el autor que la cite pero en la forma propuesta por el autor original es la siguiente:
+
+Donde I(x,x’) es la intensidad de la luz que llega del punto x’ al punto x, (x,x') es la intensidad de la luz emitida en el punto x’ hacia el punto x. (x,x',x'') es una función de distribución que determina qué proporción de la luz incidente en x’ proveniente de x’’ es rebotada hacia x. Esta función depende de las características de cada material y es comúnmente conocida como BRDF de sus siglas en inglés Bidirectional Reflectance Distribution Function.
+
+El dominio de la integral, S, es la unión de todas las superficies de la escena S=Si
+g(x,x’) es un término geométrico que determina la visibilidad entre los puntos x, x’.
+
+A primera vista esta ecuación puede parecer imponente pero si nos olvidamos por un momento de los formalismos matemáticos y nos centramos en su significado, lo que viene a decir es que la luz que llega al punto x en la dirección x'x es igual a la luz emitida en el punto x’ en la dirección x'x más la integral de toda la luz que llega al punto x’ y es dispersada en la dirección x'x.
+
+Lo significativo de esta ecuación es que resulta muy intuitivo derivar algoritmos de renderizado de la misma: se evalúa para cada punto a pintar y se evalúa I(x’, x’’) recursivamente hasta que se cumpla determinada condición.
+
+\clearpage
+
+\section{El metodo de montecarlo}
+
+\clearpage
+

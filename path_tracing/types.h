@@ -21,6 +21,14 @@ struct PerRayData_shadow
   float3 contribution;
 };
 
+struct SphereLight{
+	float3 emission;
+	float3 center;
+	float radius;
+};
+
+
+
 /*
  * Sample a uniform hemisphere
  * radius, revs must be in the range [0,1]
@@ -46,7 +54,7 @@ static __device__ __inline__ float3 sampleHemisphere( const float3& norm, float 
 	return i*x + j*norm + k*z;
 }
 
-// Create ONB from normalalized vector
+// Create ONB from normalized vector
 static
 __device__ __inline__ void createONB( const optix::float3& n,
                                       optix::float3& U,

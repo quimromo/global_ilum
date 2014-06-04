@@ -289,9 +289,9 @@ public:
 		float* buf = static_cast<float*>( m_context["output_buffer"]->getBuffer()->map());
 
 		for(unsigned int p = 0; p < width * height; ++p){
-			pixels[3*p] = static_cast<unsigned char>(saturate(buf[3*p]) * 255.99);
+			pixels[3*p] = static_cast<unsigned char>(saturate(buf[3*p + 2]) * 255.99);
 			pixels[3*p + 1] = static_cast<unsigned char>(saturate(buf[3*p + 1]) * 255.99);
-			pixels[3*p + 2] = static_cast<unsigned char>(saturate(buf[3*p + 2]) * 255.99);
+			pixels[3*p + 2] = static_cast<unsigned char>(saturate(buf[3*p]) * 255.99);
 		}
 
 		unsigned char tgah[18];
@@ -807,7 +807,7 @@ int main(int argc, char* argv[]){
 	SDL_GLContext maincontext;
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	maincontext = SDL_GL_CreateContext(window);
-	unsigned int sqrtspp = 15;
+	unsigned int sqrtspp = 10;
 	Pathtracer pt;
 	pt.init(width, height, sqrtspp, 100u);
 	pt.createObjGeometry();
