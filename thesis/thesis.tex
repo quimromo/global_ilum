@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{times}
 \usepackage{url}
+%\usepackage{natbib}
 %\usepackage{garamond}
 \pagestyle{plain}
 
@@ -14,7 +15,7 @@
 \makeindex
 
 %BIBLIOGRAPHY STYLE
-\bibliographystyle{vancouver}
+\bibliographystyle{apalike}
 
 
 %LANGUAGE
@@ -36,7 +37,8 @@
 \includeonly{
 	content/1_Introduccion,
 	content/2_Fundamentos,
-	content/3-ResearchObjectives,
+	content/3_Implementacion,
+	%content/3-ResearchObjectives,
 	content/4-ResearchPlanAndMethodology,
 	content/5-SummaryOfPriorWork,
 	content/6-Significance
@@ -84,7 +86,9 @@ En una segunda parte se discuten las tecnologías involucradas, concretamente el
 
 \include{content/2_Fundamentos}
 
-\include{content/3-ResearchObjectives}
+\include{content/3_Implementacion}
+
+%\include{content/3-ResearchObjectives}
 
 \include{content/4-ResearchPlanAndMethodology}
 
@@ -97,15 +101,16 @@ En una segunda parte se discuten las tecnologías involucradas, concretamente el
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \cleardoublepage
 %\phantomsection
+
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliography{bib/library}
 
 
 
+
+
 \backmatter
 \printindex
-
-
 
 
 

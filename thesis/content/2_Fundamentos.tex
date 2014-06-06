@@ -1,20 +1,49 @@
 \chapter{Fundamentos teóricos}
 
 \section{Unidades Radiométricas}
-
+Se conoce como radiometría al estudio de las radiaciones electromagneticas. Ya que la luz visible es una onda electromagnetica los algoritmos de renderizado que buscan el realismo se fundamentan sobre conceptos radiométricos. Por ello en esta sección haremos una pequeña introducción sobre algunos conceptos básicos que nos permitiran entender mejor los algoritmos de iluminación global.  
 \subsection{Flujo}
 
+El flujo radiometrico mide la cantidad de energia radiante por unidad de tiempo. Sus unidades son Watts o Joules/segundo.
+
+\begin{equation}
+\Phi = \frac{dQ(t)}{dt}
+\end{equation}
+
 \subsection{Irradiancia}
+La irradiancia representa el flujo incidente en una superficie y se mide como el flujo radiante por unidad de area y sus unidades son de $W/m^2$ 
+
+\begin{equation}
+E = \frac{d\Phi}{dA}
+\end{equation}
+
+\clearpage
 
 \subsection{Angulo solido}
+El angulo solido no es una unidad radiométrica en si mismo pero es un concepto geométrico necesario para poder explicar otros conceptos radiométricos además de otros apartados del presente trabajo.
+
+Podemos entender el concepto de angulo solido como la extension del angulo a las tres dimensiones.
+
+El angulo solido se mide como el área medida sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas stereorradianes $[sr]$.
+\begin{equation}
+\Omega = \frac{A}{r^2}
+\end{equation}
+
+Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el angulo solido diferencial como:
+
+\begin{equation}
+d \omega _ \Theta = \sin \theta d \theta d \phi
+\end{equation}
 
 \subsection{Radiancia}
+
+
 
 \clearpage
 
 \section{BRDF}
 
-La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada
+La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por \cite{Nicodemus1965} Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada
 
 \begin{equation}
 f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} 
@@ -23,12 +52,34 @@ f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)}
 donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
 
 La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
+\newline
+
+Para obtener la radiancia total reflejada en un punto $x$ en la dirección saliente $v$ es necesario integrar sobre el angulo solido en el dominio de la hemiesfera centrada en $x$.
+
+\begin{equation}
+L _ o = \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i 
+\end{equation}
+
+\subsection{Propiedades de la BRDF}
+
+Una BRDF debe cumplir ciertas propiedades para que sea físicamente plausible.
+En primer lugar debe cumplir la ley de conservación de la energía. En el caso que nos ocupa esto significa que una superficie puede absorber luz, transformándola en calor, o puede reflejarla pero en ningún caso puede reflejar mas energía lumínica que la que recibe.
+
+\begin{equation}
+\forall l, \int_{\Omega_x} f(x,l,v) (n \cdot v) d\omega_o \leq 1
+\end{equation}
+
+Además también debe ser reciproca, esto significa que si intercambiamos los vectores $l$ y $v$ su valor se mantiene. Este hecho cobra sentido si pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vector $v$ y $l$ el angulo entre ellos sigue siendo el mismo.
+
+\begin{equation}
+f(x, l, v) = f(x, v, l)
+\end{equation} 
 
 \clearpage
 
 \section{Ecuación de renderizado}
 
-James T. Kajiya (1986) propuso una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
+La ecuación de renderizado fue desarrollada simultaneamente por James T. Kajiya (1986) propuso una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
 
 Esta ecuación se puede encontrar en muchas formas distintas según el autor que la cite pero en la forma propuesta por el autor original es la siguiente:
 
