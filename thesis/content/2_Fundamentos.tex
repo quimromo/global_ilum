@@ -29,7 +29,7 @@ Podemos entender el concepto de angulo solido como la extension del angulo a las
 \caption{Definición de angulo solido \cite{Haade}}
 \end{figure}
 
-El angulo solido se mide como el área medida sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas stereorradianes $[sr]$.
+El angulo solido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas stereorradianes $[sr]$.
 \begin{equation}
 \Omega = \frac{A}{r^2}
 \end{equation}
@@ -40,6 +40,8 @@ Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el ang
 \begin{equation}
 d \omega _ \Theta = \sin \theta d \theta d \phi
 \end{equation}
+
+Informalmente resulta sencillo entender el angulo solido si pensamos en \emph{cuan grande se ve un objeto}. Supongamos una superficie perpendicular a la dirección de visión del observador: si este objeto esta muy cerca, diremos que subtiende un angulo solido mayor que la misma superficie a una mayor distancia en la misma dirección.
 
 \clearpage
 
@@ -78,6 +80,7 @@ La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \
 Para obtener la radiancia total reflejada en un punto $x$ en la dirección saliente $v$ es necesario integrar sobre el angulo solido en el dominio de la hemiesfera centrada en $x$.
 
 \begin{equation}
+\label{eq:radiance_integral}
 L _ o = \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i 
 \end{equation}
 
@@ -92,19 +95,34 @@ En primer lugar debe cumplir la ley de conservación de la energía. En el caso 
 \forall l, \int_{\Omega_x} f(x,l,v) (n \cdot v) d\omega_o \leq 1
 \end{equation}
 
-Además también debe ser reciproca, esto significa que si intercambiamos los vectores $l$ y $v$ su valor se mantiene. Este hecho cobra sentido si pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vector $v$ y $l$ el angulo entre ellos sigue siendo el mismo.
+En términos informales esta ecuación significa que la integral de toda la luz reflejada debido a un rayo de luz entrante nunca podrá ser superior a la luz entrante por ese rayo.
+
+\medskip
+Además también debe cumplir el \emph{principio de reciprocidad de Helmholtz}, esto significa que si intercambiamos los vectores $l$ y $v$ su valor se mantiene. Este hecho cobra sentido si pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vectores $v$ y $l$ el angulo entre ellos sigue siendo el mismo.
 
 \begin{equation}
 f(x, l, v) = f(x, v, l)
 \end{equation} 
 
+
 \clearpage
 
 \section{Ecuación de renderizado}
 
-La ecuación de renderizado fue desarrollada en los años 80 simultaneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immmel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
+La ecuación de renderizado fue desarrollada en los años 80 simultaneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
 
-Esta ecuación se puede encontrar en muchas formas distintas según el autor que la cite pero en la forma propuesta por el autor original es la siguiente:
+\medskip
+Existen varias versiones de esta ecuación segun el autor que la use que, en general, se pueden clasificar en dos tipos: las que integran sobre la hemiesfera, que se corresponde con la ecuacion propuesta por Immel y las que integran sobre la union de las superficies de la escena, que es la version propuesta por Kajiya.
+\medskip
+
+Consideremos la ecuación \ref{eq:radiance_integral}  y consideremos que además de dispersar luz una superficie también puede emitir luz, siendo $L_e$ la radiancia de la luz emitida, entonces tenemos la ecuación de renderizado.
+
+\begin{equation}
+L _ o = L_e + \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i 
+\end{equation}
+
+
+
 
 Donde I(x,x’) es la intensidad de la luz que llega del punto x’ al punto x, (x,x') es la intensidad de la luz emitida en el punto x’ hacia el punto x. (x,x',x'') es una función de distribución que determina qué proporción de la luz incidente en x’ proveniente de x’’ es rebotada hacia x. Esta función depende de las características de cada material y es comúnmente conocida como BRDF de sus siglas en inglés Bidirectional Reflectance Distribution Function.
 
@@ -117,7 +135,7 @@ Lo significativo de esta ecuación es que resulta muy intuitivo derivar algoritm
 
 \clearpage
 
-\section{El metodo de montecarlo}
+\section{El método de montecarlo}
 
 El método de montecarlo se trata de un método de integración numérico para integrales definidas sobre un dominio de dimension arbitraria, del tipo:
 \begin{equation}
@@ -134,6 +152,7 @@ E(f(x)) = \int f(x)p(x)dx \approx \frac{1}{N} \sum _{i=1} ^N f(x_i)
 El método de montecarlo se basa en este hecho para estimar el valor de una integral definida tomando muestras aleatorias sobre el dominio $x_1, x_2, ..., x_n \in D$ y aplicando:
 
 \begin{equation}
+\label{eq:montecarlo}
 I = \int_D f(x)dx \approx \frac{1}{N} \sum _{i=1} ^N \frac{f(x_i)}{p(x_i)} 
 \end{equation}
 
@@ -147,8 +166,17 @@ p(x_i) = \frac{1}{\int _D dx}
 I \approx \frac{\int _D dx}{N} \sum_{i=1} ^N f(x_i)
 \end{equation}
 
+El error en una estimación de este tipo se reduce a medida que $N$ crece.
+\clearpage
+
 \subsection{Muestreo de importancia}
     
+Otra forma de reducir el error a parte de tomar mas muestras es tomarlas de forma mas inteligente. Anteriormente hemos supuesto que tomamos las muestras de una distribución uniforme sobre el dominio pero el método de montecarlo no impone ninguna limitación en este aspecto. Lo que implica que podemos tomar las muestras de otro tipo de distribuciones que sean mas apropiadas para cada caso. Por ejemplo tomando mas muestras en aquellas partes del dominio de integración que sean mas interesantes o importantes para nuestros propósitos.
 
-\clearpage
+\medskip
+
+Para ello basta con tomar las muestras $x_1, x_2, ..., x_n$ según la distribución usada y substituir $p(x_i)$ en la ecuación \ref{eq:montecarlo} por la probabilidad correspondiente.
+
+\subsection{Muestreo estratificado}
+
 
