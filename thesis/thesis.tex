@@ -11,6 +11,12 @@
 %\usepackage{garamond}
 \pagestyle{plain}
 
+\usepackage{float}
+%\floatstyle{boxed}
+%\restylefloat{figure}
+
+\usepackage{amssymb}
+
 \usepackage{makeidx}
 \makeindex
 
@@ -27,7 +33,7 @@
 
 %YOUR INFORMATION HERE:
 
-\title{Trazado de rayos estocástico en la GPU}
+\title{Implementación del algoritmo de path tracing en la GPU}
 \subtitle{}
 \author{Joaquim Romo}
 \thyear{2014}
@@ -39,9 +45,9 @@
 	content/2_Fundamentos,
 	content/3_Implementacion,
 	%content/3-ResearchObjectives,
-	content/4-ResearchPlanAndMethodology,
-	content/5-SummaryOfPriorWork,
-	content/6-Significance
+	%content/4-ResearchPlanAndMethodology,
+	%content/5-SummaryOfPriorWork,
+	%content/6-Significance
 }
 
 \begin{document}
@@ -73,10 +79,10 @@ En una segunda parte se discuten las tecnologías involucradas, concretamente el
 \tableofcontents
 \listoffigures
 
-\addcontentsline{toc}{chapter}{Index of figures}
+\addcontentsline{toc}{chapter}{Índice de figuras}
 \listoftables
 
-\addcontentsline{toc}{chapter}{Index of tables}
+\addcontentsline{toc}{chapter}{Índice de tablas}
 
 \cleardoublepage
 
@@ -90,11 +96,11 @@ En una segunda parte se discuten las tecnologías involucradas, concretamente el
 
 %\include{content/3-ResearchObjectives}
 
-\include{content/4-ResearchPlanAndMethodology}
+%\include{content/4-ResearchPlanAndMethodology}
 
-\include{content/5-SummaryOfPriorWork}
+%\include{content/5-SummaryOfPriorWork}
 
-\include{content/6-Significance}
+%\include{content/6-Significance}
 
 
 

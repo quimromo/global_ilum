@@ -23,11 +23,17 @@ E = \frac{d\Phi}{dA}
 El angulo solido no es una unidad radiométrica en si mismo pero es un concepto geométrico necesario para poder explicar otros conceptos radiométricos además de otros apartados del presente trabajo.
 
 Podemos entender el concepto de angulo solido como la extension del angulo a las tres dimensiones.
+\begin{figure}[h]
+\centering
+\includegraphics[width=2in]{Solid_Angle.png}
+\caption{Definición de angulo solido \cite{Haade}}
+\end{figure}
 
 El angulo solido se mide como el área medida sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas stereorradianes $[sr]$.
 \begin{equation}
 \Omega = \frac{A}{r^2}
 \end{equation}
+
 
 Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el angulo solido diferencial como:
 
@@ -35,8 +41,17 @@ Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el ang
 d \omega _ \Theta = \sin \theta d \theta d \phi
 \end{equation}
 
+\clearpage
+
 \subsection{Radiancia}
 
+La radiancia, también llamada intensidad por algunos autores \cite{Kajiya1986, Immel1986}, es probablemente la unidad radiometrica mas importante en lo que concierne al presente trabajo.
+
+Esta unidad mide la irradiancia por unidad de angulo solido.
+
+\begin{equation}
+L = \frac{dE}{d\omega} = \frac{d^2\Phi}{d\omega dA\cos \theta} 
+\end{equation}
 
 
 \clearpage
@@ -52,13 +67,21 @@ f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)}
 donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
 
 La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
-\newline
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.5]{Rendering_eq.png}
+\caption{BRDF $l = \omega_i, v = \omega_o$ }
+\end{figure}
+
 
 Para obtener la radiancia total reflejada en un punto $x$ en la dirección saliente $v$ es necesario integrar sobre el angulo solido en el dominio de la hemiesfera centrada en $x$.
 
 \begin{equation}
 L _ o = \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i 
 \end{equation}
+
+\clearpage
 
 \subsection{Propiedades de la BRDF}
 
@@ -79,7 +102,7 @@ f(x, l, v) = f(x, v, l)
 
 \section{Ecuación de renderizado}
 
-La ecuación de renderizado fue desarrollada simultaneamente por James T. Kajiya (1986) propuso una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
+La ecuación de renderizado fue desarrollada en los años 80 simultaneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immmel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
 
 Esta ecuación se puede encontrar en muchas formas distintas según el autor que la cite pero en la forma propuesta por el autor original es la siguiente:
 
@@ -95,6 +118,37 @@ Lo significativo de esta ecuación es que resulta muy intuitivo derivar algoritm
 \clearpage
 
 \section{El metodo de montecarlo}
+
+El método de montecarlo se trata de un método de integración numérico para integrales definidas sobre un dominio de dimension arbitraria, del tipo:
+\begin{equation}
+I = \int_D f(x)dx , D \subseteq \mathbb{R}^m
+\end{equation}
+
+Sabemos que la esperanza de una función continua se define como la integral de la función por la probabilidad de $x$. Y que podemos estimar la esperanza calculando la media de los valores que toma la función en puntos aleatorios escogidos independientemente y con la misma distribución.
+
+\begin{equation}
+E(f(x)) = \int f(x)p(x)dx \approx \frac{1}{N} \sum _{i=1} ^N f(x_i) 
+\end{equation}
+
+
+El método de montecarlo se basa en este hecho para estimar el valor de una integral definida tomando muestras aleatorias sobre el dominio $x_1, x_2, ..., x_n \in D$ y aplicando:
+
+\begin{equation}
+I = \int_D f(x)dx \approx \frac{1}{N} \sum _{i=1} ^N \frac{f(x_i)}{p(x_i)} 
+\end{equation}
+
+Siendo $p(x_i)$ la probabilidad de tomar una muestra $x_i$ concreta de entre todas las posibles en el dominio $D$. En el caso de tomar las muestras sobre una distribución uniforme:
+
+\begin{equation}
+p(x_i) = \frac{1}{\int _D dx}
+\end{equation}
+
+\begin{equation}
+I \approx \frac{\int _D dx}{N} \sum_{i=1} ^N f(x_i)
+\end{equation}
+
+\subsection{Muestreo de importancia}
+    
 
 \clearpage
 

@@ -222,8 +222,8 @@
       \rule{\linewidth}{1mm} \par
       \vskip 1cm%
     {\large Treball Final de Grau / \@thyear}\\[2cm]
-    {\normalsize THESIS ADVISOR}\par
-    {\large \@supervisor} {\large Departament \@department} \par
+    {\normalsize DIRECTOR}\par
+    {\large \@supervisor} {\large Departamento \@department} \par
     \vspace{3cm}
    \centering  
     \includegraphics[scale=.4]{logo_upf.png}
