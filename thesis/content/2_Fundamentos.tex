@@ -47,7 +47,7 @@ Informalmente resulta sencillo entender el angulo solido si pensamos en \emph{cu
 
 \subsection{Radiancia}
 
-La radiancia, también llamada intensidad por algunos autores \cite{Kajiya1986, Immel1986}, es probablemente la unidad radiometrica mas importante en lo que concierne al presente trabajo.
+La radiancia, también llamada intensidad por algunos autores \cite{Kajiya1986, Immel1986}, es probablemente la unidad radiometrica mas importante en lo que concierne al presente trabajo y a muchos de los algoritmos de iluminación global ya que su valor es invariante a lo largo de la longitud de un rayo.
 
 Esta unidad mide la irradiancia por unidad de angulo solido.
 
@@ -63,7 +63,7 @@ L = \frac{dE}{d\omega} = \frac{d^2\Phi}{d\omega dA\cos \theta}
 La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por \cite{Nicodemus1965} Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada
 
 \begin{equation}
-f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} 
+f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} = \frac{dL(x \to v)}{L(x \gets l) \cos\theta d\omega_i} 
 \end{equation}
 
 donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
@@ -104,6 +104,17 @@ Además también debe cumplir el \emph{principio de reciprocidad de Helmholtz}, 
 f(x, l, v) = f(x, v, l)
 \end{equation} 
 
+\subsection{Isotropía y anisotropía de la BRDF}
+
+\subsection{Modelo de Phong modificado}
+
+\subsection{Modelo de Blinn-Phong}
+
+\subsection{Modelo de Cook-Torrance}
+
+\subsection{Modelo de Ward}
+
+\subsection{Modelo de Beckmann}
 
 \clearpage
 

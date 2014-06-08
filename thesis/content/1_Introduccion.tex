@@ -38,10 +38,13 @@ El funcionamiento del algortimo, en lineas generales, se basa en dividir la esce
 
 \subsection{Path tracing}
 
-El algoritmo de path tracing \cite{Kajiya1986} sue posiblemente el primer algoritmo capaz de solucionar completamente la ecuación de renderizado.
+El algoritmo de path tracing \cite{Kajiya1986} sea posiblemente el primer algoritmo capaz de solucionar completamente la ecuación de renderizado.
 
 \medskip
-Este algoritmo empieza como el ray tracing clasico, lanzado rayos desde la camara hacia la escena, pero cuando un rayo intersecciona con un objeto se lanza un rayo en una dirección aleatoria para tener una estimación de cuanta luz indirecta llega a ese punto. Este rayo aleatorio a su vez es evaluado recursivamente siguiendo el mismo algoritmo.  
+Este algoritmo empieza como el ray tracing clásico, lanzado rayos desde la cámara hacia la escena, pero cuando un rayo intersecciona con un objeto se lanza un rayo en una dirección aleatoria para tener una estimación de cuanta luz indirecta llega a ese punto. Este rayo aleatorio a su vez es evaluado recursivamente siguiendo el mismo algoritmo. 
+
+\medskip 
+Evidentemente este proceso de trazar un rayo desde la cámara y hacerlo rebotar por la escena para obtener un estimación de la luz es muy impreciso, por lo que es necesario repetir el proceso varias veces y hacer la media entre los resultados obtenidos para obtener  una solución satisfactoria. 
 
 \subsection{Bidirectional path tracing}
 
@@ -54,8 +57,28 @@ La principal mejora de este algoritmo respecto a su antecesor es que es capaz de
 
 Siguiendo en la linea de los dos algoritmos anteriores otra notable mejora llego con el llamado Metropolis light transport \cite{Veach1997}. Este algoritmo parte de la base del path tracing bidireccional pero en vez de confiar en crear muchos paths hasta converger a una solución aceptable utiliza un método conocido como algoritmo de Metropolis-Hastings para generar varias mutaciones del mismo path. 
 
+\medskip
+Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales que normalmente serian muy costosas de renderizar con los algoritmos que hemos comentado anteriormenteme. Por ejemplo causiticas, interreflecciones especulares-difusas, etc.
+
+\clearpage
+
 \subsection{Photon mapping}
 
+Todos los algoritmos que estamos viendo tratan la luz como partículas y no como ondas, pero este algoritmo lo hace de un modo aun mas explicito.
+El algoritmo de Photon mapping [REFERENCIA JENSEN] empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y segun las propiedades (BRDF) del material si el foton sera absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
+
+\medskip
+La siguente fase, llamada final gathering, realiza un ray tracing de la escena y en cada intersección consulta el mapa de fotones para ver la cantidad de luz que llega a ese punto.
+
+\medskip
+Este algoritmo sobresale entre todos los demás cuando se trata de renderizar causticas. Pero en cambio puede producir errores cuando se renderizan superficies difusas si el numero de fotones no es muy grande.
+
+
 \subsection{Instant radiosity}
+
+Este algoritmo, desarrollado por Keller en 1997, combina las ideas de los algoritmos de radiosity y photon mapping. Igual que el radiosity original, este algoritmo, en principio, solo funciona para superficies puramente difusas.
+
+\medskip
+La idea general consiste en lanzar fotones desde las fuentes de luz (como en foton mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX. 
 
 \subsection{Irrandiance caching}
