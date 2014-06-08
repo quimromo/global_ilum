@@ -112,7 +112,7 @@ f(x, l, v) = f(x, v, l)
 La ecuación de renderizado fue desarrollada en los años 80 simultaneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
 
 \medskip
-Existen varias versiones de esta ecuación segun el autor que la use que, en general, se pueden clasificar en dos tipos: las que integran sobre la hemiesfera, que se corresponde con la ecuacion propuesta por Immel y las que integran sobre la union de las superficies de la escena, que es la version propuesta por Kajiya.
+Existen varias versiones de esta ecuación, según el autor que la use, que en general se pueden clasificar en dos tipos: las que integran sobre la hemiesfera, que se corresponde con la ecuación propuesta por Immel y las que integran sobre la unión de las superficies de la escena, que es la version propuesta por Kajiya.
 \medskip
 
 Consideremos la ecuación \ref{eq:radiance_integral}  y consideremos que además de dispersar luz una superficie también puede emitir luz, siendo $L_e$ la radiancia de la luz emitida, entonces tenemos la ecuación de renderizado.
@@ -121,17 +121,13 @@ Consideremos la ecuación \ref{eq:radiance_integral}  y consideremos que además
 L _ o = L_e + \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i 
 \end{equation}
 
+Es decir, que la radiancia total $L_o$ que sale de un punto $x$ es igual a la suma de la radiancia emitida por ese punto en la dirección de salida $v$ mas la integral de toda la radiancia que llega a ese punto y es reflejada en la dirección de salida.
+\medskip
 
+Lo significativo de esta ecuación es que resulta muy intuitivo derivar algoritmos de renderizado de la misma: se evalúa para cada punto a pintar y se evalúa $L_i$ recursivamente hasta que se cumpla determinada condición.
+\medskip
 
-
-Donde I(x,x’) es la intensidad de la luz que llega del punto x’ al punto x, (x,x') es la intensidad de la luz emitida en el punto x’ hacia el punto x. (x,x',x'') es una función de distribución que determina qué proporción de la luz incidente en x’ proveniente de x’’ es rebotada hacia x. Esta función depende de las características de cada material y es comúnmente conocida como BRDF de sus siglas en inglés Bidirectional Reflectance Distribution Function.
-
-El dominio de la integral, S, es la unión de todas las superficies de la escena S=Si
-g(x,x’) es un término geométrico que determina la visibilidad entre los puntos x, x’.
-
-A primera vista esta ecuación puede parecer imponente pero si nos olvidamos por un momento de los formalismos matemáticos y nos centramos en su significado, lo que viene a decir es que la luz que llega al punto x en la dirección x'x es igual a la luz emitida en el punto x’ en la dirección x'x más la integral de toda la luz que llega al punto x’ y es dispersada en la dirección x'x.
-
-Lo significativo de esta ecuación es que resulta muy intuitivo derivar algoritmos de renderizado de la misma: se evalúa para cada punto a pintar y se evalúa I(x’, x’’) recursivamente hasta que se cumpla determinada condición.
+El problema es que no parece factible encontrar una solución analítica de esta ecuación y por este motivo se aplican métodos de integración numérica para aproximar una solución.
 
 \clearpage
 
@@ -156,10 +152,10 @@ El método de montecarlo se basa en este hecho para estimar el valor de una inte
 I = \int_D f(x)dx \approx \frac{1}{N} \sum _{i=1} ^N \frac{f(x_i)}{p(x_i)} 
 \end{equation}
 
-Siendo $p(x_i)$ la probabilidad de tomar una muestra $x_i$ concreta de entre todas las posibles en el dominio $D$. En el caso de tomar las muestras sobre una distribución uniforme:
+Siendo $p(x_i)$ la probabilidad de tomar una muestra $x_i$ concreta de entre todas las posibles en el dominio $D$. En el caso de tomar las muestras sobre una distribución uniforme en $D$:
 
 \begin{equation}
-p(x_i) = \frac{1}{\int _D dx}
+\forall x_i, p(x_i) = \frac{1}{\int _D dx}
 \end{equation}
 
 \begin{equation}
@@ -178,5 +174,7 @@ Otra forma de reducir el error a parte de tomar mas muestras es tomarlas de form
 Para ello basta con tomar las muestras $x_1, x_2, ..., x_n$ según la distribución usada y substituir $p(x_i)$ en la ecuación \ref{eq:montecarlo} por la probabilidad correspondiente.
 
 \subsection{Muestreo estratificado}
+
+El muestreo estratificado es otro metodo para reducir la variancia de la estimación. En este caso lo que se hace es dividir el dominio de la integral en regiones y aplicar montecarlo para cada región.  
 
 
