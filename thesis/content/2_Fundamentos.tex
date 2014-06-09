@@ -250,10 +250,48 @@ $y = r_1 \sin (2\pi r_2)$
 
 $z = \sqrt{1 - x^2 - y^2}$
 
+\smallskip
+
+$l = (x, y, z)$
+
 \medskip
 
-La parte mas interesante es muestrear el lobulo especular de la BRDF. Una buena explicación del procedimiento se encuentra en \cite{Lafortune1994}.
+En este caso la funcion de densidad de probabilidad (pdf) es
 
+\smallskip
+
+\begin{equation}
+pdf(l_{diff}) = \frac{(l \cdot n)}{\pi}
+\end{equation}
+
+La parte mas interesante es muestrear el lóbulo especular de la BRDF. Una buena explicación del procedimiento se encuentra en \cite{Lafortune1994}. En este caso la función de densidad de probabilidad es
+
+\begin{equation}
+pdf(l_{spec}) = \frac{n + 1}{2\pi}\cos^n\theta
+\end{equation}
+
+\begin{equation}
+(\phi, \theta) = (2\pi r_1, \arccos(r_2^{\frac{1}{n+1}}) 
+\end{equation}
+
+\clearpage
 
 \subsection{Muestreo del angulo solido subtendido}
+
+Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear un fuente de luz sera necesario integrar el angulo solido subtendido por dicha fuente de luz. A priori, no sabemos si la fuente de luz estara ocluida pero si que podemos saber que angulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega, por lo tanto la idea sera lanzar solo rayos dentro de este angulo solido para que vayan dirigidos hacia la fuente de luz.
+
+\medskip
+
+Para proceder de este modo sera necesario calcular el angulo solido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos usado fuentes de luz en forma de cúpula celestial, esféricas, paralelogramos y triángulos.
+
+\subsubsection{Cúpula}
+
+\subsubsection{Esfera}
+
+\subsubsection{Paralelogramo}
+
+\subsubsection{Triangulo}
+
+
+
 

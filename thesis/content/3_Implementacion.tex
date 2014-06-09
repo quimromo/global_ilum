@@ -1,8 +1,53 @@
-\chapter{Framework}
+\chapter{Implementación}
 
-\section{Cuda}
+\section{Introducción a OptiX}
 
-\section{La libreria OptiX}
+OptiX es una librería desarrollada por Nvidia para hacer ray tracing en la GPU. OptiX fue desarrollada con el propósito de ser lo mas flixible posible y adaptarse a las necesidades del programador. Por ello solo ofrece la funcionalidad de lanzar rayos y es responsabilidad del programador implementar el funcionamiento de esos rayos: como seran lanzados, que datos portaran, que sucederá cuando intereseccionen con un objeto, etc.
+
+\medskip
+
+Esta funcionalidad se implementa mediante lo que en OptiX se llaman programas. Los programas de OptiX son fragmentos de código CUDA con acceso a las funciones de OptiX, básicamente para el trazado de rayos, que serán compilados por el compilador de Nvidia (nvcc) y se ensamblaran en kernels CUDA para ser ejecutados en la GPU. 
+
+\medskip
+De ahora en adelante cuando hablemos de programas nos estaremos refiriendo a estos fragmentos de codigo CUDA, cuando queramos referirnos al conjunto del sistema de renderizado que es el objeto de este trabajo usaremos la expresión aplicación o sistema. Además en el contexto de CUDA y OptiX se conoce como Device a la GPU y como Host a la CPU.
+
+
+\subsection{Device}
+
+OptiX tiene un conjunto de programas que pueden ser implementados. Cada uno de ellos se encarga de una tarea especifica dentro del flujo de ejecución de una aplicación OptiX. En esta sección veremos cuales son estos tipos de programas y que utilidad tiene cada uno de ellos.  
+
+\subsubsection{Ray generation programs}
+
+Este tipo de programas son los puntos de entrada de una aplicación OptiX y es desde donde se crear y lanzan los rayos primarios. Tipicamente, en una aplicación de renderizado se implementa la cámara en un programa de esto tipo.
+
+\subsubsection{Intersection programs}
+
+Los programas de intersección se encargan de determinar si un rayo intersecciona con un objeto y en caso afirmativo retorna la distancia a la que se ha producido la intersección. Ademas, el programador tiene flexibilidad para calcular y retornar datos relativos a esta intersección, típicamente las coordenadas de textura, la normal a la superficie en el punto de intersección, etc.
+
+\medskip
+
+El hecho de que el programador pueda determinar si se ha producido una intersección ofrece gran flexibilidad para implementar distintos tipos de superficies, desde un simple triangulo o esfera a complejas superficies procedimentales.
+
+\subsubsection{Bounding box programs}
+
+Estos programas van ligados a los programas de intersección y su función es la de calcular una AABB (del inglés Axis Aligned Bounding Box) que contenga el objeto con el que estan asociados. La implementación de estos programas no es obligatoria para que OptiX pueda determinar la intersección pero aceleran el proceso y son necesarios si se quiere construir una estructura de aceleración.
+
+\subsubsection{Closest hit programs}
+
+Este es el tipo de programa mas interesante para el caso que nos ocupa ya que aqui es donde se calcula el resultado final de una intersección, normalmente el color de un punto en el espacio. Aquí es donde se hacen los accesos a texturas, se hace el shading y se pueden lanzar rayos recursivamente.
+
+\medskip
+
+Estos programas, como su nombre indica, se ejecutan solo para la intersección mas cercana del rayo con la escena.
+
+\subsubsection{Any hit programs}
+
+Por el contrario, los programas any hit, se ejecutan para todas las intersecciones que encuentre un rayo en su camino, a menos que explicitamente se termine la ejecución del rayo.
+Un uso típico de estos programas es para el calculo de sombras, si cualquier punto de la escena ocluye la luz se termina el rayo y se retorna este hecho. Lo cual ofrece un mayor rendimiento en contraposición a tener que esperar a encontrar la intersección mas cercana.
+
+\subsubsection{Otros programas}
+
+Los programas que hemos visto hasta ahora son los mas relevantes y los que ofrecen la mayoría de funcionalides pero existen otros programas que se pueden implementar para ofrecer otras funcionalidad.
 
 \subsection{Host}
 
@@ -10,11 +55,5 @@
 
 \subsubsection{clase Geometry}
 
-\subsection{Device}
 
-\subsubsection{Intersection programs}
-
-\subsubsection{Closest hit programs}
-
-\subsubsection{Any hit programs}
 
