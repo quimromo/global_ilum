@@ -147,7 +147,7 @@ RT_PROGRAM void diffuse()
 				float r1 = rnd(seed);
 				float r2 = rnd(seed);
 				float3 p;
-				//cosine_sample_hemisphere(r1, r2, p);
+				cosine_sample_hemisphere(r1, r2, p); p = normalize(p);
 				//p = sampleHemisphere(r1, r2);
 				float z = 1.0f - 2.0f * r1;
 				float r = sqrtf( fmaxf( 0.0f, 1.0f - z*z) );
@@ -155,8 +155,8 @@ RT_PROGRAM void diffuse()
 				float x = r * cos(phi);
 				float y = r * sin(phi);
  
-				p = normalize( make_float3(x, y, z ) );
-				float pdf = 1.0f / (4.0f * PI);
+				//p = normalize( make_float3(x, y, z ) );
+				//float pdf = 1.0f / (4.0f * PI);
 			
 				/* sample solid angle
 				float theta = 2.0f * PI;
@@ -176,14 +176,14 @@ RT_PROGRAM void diffuse()
 				shadow_prd.contribution = make_float3(1.0f);
 				Ray shadow_ray = Ray( hit, rd, shadow_ray_type, scene_epsilon);
 				rtTrace(top_object, shadow_ray, shadow_prd);
-				direct_color +=  shadow_prd.contribution * dot(rd, ffnormal);
+				direct_color +=  shadow_prd.contribution;// * dot(rd, ffnormal);
 
 			}
-			direct_color *= Kd * 2.0f * PI * dome_emission;
+			direct_color *= Kd * PI * dome_emission;
 			direct_color /= num_samples;
 			color += direct_color;
 		}
-
+		/*
 		for(int i = 0; i < spherical_lights.size(); ++i){
 			float3 light_dir = spherical_lights[i] - hit;
 			float dist2 = dot(light_dir, light_dir);
@@ -197,7 +197,7 @@ RT_PROGRAM void diffuse()
 
 
 		}
-
+		*/
 
 	}
 

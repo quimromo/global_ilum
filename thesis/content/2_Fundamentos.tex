@@ -106,7 +106,23 @@ f(x, l, v) = f(x, v, l)
 
 \subsection{Isotropía y anisotropía de la BRDF}
 
+Una BRDF isotropica es aquella en la que su valor se mantendrá constante si aplicamos la misma rotación a $v$ y a $l$ alrededor de la normal de la superficie. Por el contrario una BRDF anisotropia cambiara su valor dependido de la rotación de $v$ y $l$ alrededor de la normal.
+
+\clearpage
+
 \subsection{Modelo de Phong modificado}
+Una de las BRDFs mas usadas en los algoritmos de ray tracing estocástico es la BRDF basada en el modelo de Phong modificado, que fue descrito por primera vez por Lewis (1994) \nocite{Lewis1994} y posteriormente explorado en mas profundidad en \cite{Lafortune1994}. Esta BRDF esta basado en el conocido modelo de reflexión local de Phong \cite{Phong1975} que fue adaptado por Lewis para cumplir con el principio de conservación de la energía.
+
+En la forma usada por Lafortune y Willems la función aparece como:
+
+\begin{equation}
+f(x, l, v) = \frac{k_d}{\pi} + k_s \frac{n + 2}{2 \pi} \cos^n\alpha
+\end{equation}
+
+donde $\alpha$ es el angulo entre la dirección de reflexión especular perfecta y $v$.
+En esta forma la función esta normalizada para conservar la energía pero además para que esto sea cierto se debe cumplir $k_d + k_s \leq 1$.
+
+ 
 
 \subsection{Modelo de Blinn-Phong}
 
@@ -186,11 +202,58 @@ Para ello basta con tomar las muestras $x_1, x_2, ..., x_n$ según la distribuci
 
 \subsection{Muestreo estratificado}
 
-El muestreo estratificado es otro metodo para reducir la variancia de la estimación. En este caso lo que se hace es dividir el dominio de la integral en regiones y aplicar montecarlo para cada región. 
+El muestreo estratificado es otro método para reducir la variancia de la estimación. En este caso lo que se hace es dividir el dominio de la integral en regiones y aplicar montecarlo para cada región. 
+
+\clearpage
 
 \section{Aplicaciones del muestreo de importancia}
 
-\subsection{Muestreo del angulo solido subtendido}
+En esta sección veremos dos aplicaciones practicas en los algoritmos de ray tracing estocástico del muestreo de importancia y como usando esta técnica es posible reducir el numero de muestras necesarias para obtener una buena estimación de la integral.
+
 
 \subsection{Muestreo de la BRDF}
+
+Aunque algunos de los conceptos explicados aquí son aplicables a otros modelos, para esta explicación nos centraremos en la BRDF de Phong modificada, ya que es la usada en nuestra implementación además de una de las mas exploradas \cite{Lafortune1994}.
+
+\medskip
+
+El problema que nos ocupa se nos presenta cuando tenemos que estimar la luz que llega a un punto del espacio. Una aproximación \emph{naive}, sin usar muestreo de importancia, seria muestrear uniformemente direcciones en la hemiesfera y evaluar la BRDF para cada dirección. Esto puede funcionar bien cuando se trata de materiales puramente difusos, sin componente especular o con un lóbulo especular muy abierto. Por el contrario en el caso de encontrarnos con una superficie altamente especular, como por ejemplo un metal, la cantidad de muestras necesarias para obtener una estimación decente seria desorbitada ya que la probabilidad de elegir una dirección dentro del lóbulo especular seria muy pequeña.
+
+\medskip
+Cuando nos encontremos en la tesitura de tener que muestrear proporcionalmente a la BRDF lo primero que habrá que tener en cuenta sera decidir si muestrear la parte difusa o la parte especular de la BRDF de forma proporcional a las características del material en cuestión. Es decir que para un rayo, la probabilidad de muestrear el lóbulo difuso sera de $k_d$, la probabilidad de muestrear el lóbulo especular sera $k_s$ y la probabilidad de ser absorbido sera $1 - k_d - k_s$.
+
+\medskip
+
+Para ello generaremos un numero aleatorio $0 \leq r \leq 1$ y si
+$r \leq k_s$ muestrearemos la parte especular,
+si $k_s < r \leq k_s + k_d$ muestrearemos la parte difusa
+y si $k_s + k_d < r$ el rayo sera absorbido por el material.
+
+\medskip
+
+Una vez decidido el evento a evaluar procederemos de forma distinta según cada caso. En el caso de evaluar la parte difusa podemos muestrear uniformente sobre la hemiesfera o podemos muestrear usando una distribución coseno como defienden algunos autores.
+
+\clearpage
+
+Una forma sencilla de obtener puntos distribuidos con densidad de coseno en la hemiesfera es generar puntos uniformemente sobre un circulo unitario y luego proyectarlos a la hemiesfera.
+Para ello generamos dos números aleatorios $r_1$ y $r_2$ en el intervalo $[0, 1]$ y hacemos:
+
+\smallskip
+
+$x = r_1 \cos (2\pi r_2)$
+
+\smallskip
+
+$y = r_1 \sin (2\pi r_2)$
+
+\smallskip
+
+$z = \sqrt{1 - x^2 - y^2}$
+
+\medskip
+
+La parte mas interesante es muestrear el lobulo especular de la BRDF. Una buena explicación del procedimiento se encuentra en \cite{Lafortune1994}.
+
+
+\subsection{Muestreo del angulo solido subtendido}
 
