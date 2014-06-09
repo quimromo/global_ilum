@@ -270,9 +270,30 @@ La parte mas interesante es muestrear el lóbulo especular de la BRDF. Una buena
 pdf(l_{spec}) = \frac{n + 1}{2\pi}\cos^n\theta
 \end{equation}
 
+I el vector resultante, en coordenadas esféricas:
+
 \begin{equation}
 (\phi, \theta) = (2\pi r_1, \arccos(r_2^{\frac{1}{n+1}}) 
 \end{equation}
+
+En ambos casos se prosigue trazando el rayo con la dirección obtenida y se calcula la radiancia reflejada en la direccion $v$ en función de la radiancia entrante $L(x \gets l)$ del siguiente modo:
+\medskip
+
+si estamos evaluando el factor difuso
+\begin{equation}
+L(x \to v) = \frac{L(x \gets l)k_d(n \cdot l)}{q_1 pdf_{diff}(l)}
+\end{equation}
+
+si evaluamos el factor especular
+
+\begin{equation}
+L(x \to v) = \frac{L(x \gets l)k_d(n \cdot l)(R \cdot v)^n}{q_2 pdf_{spec}(l)}
+\end{equation}
+
+y si el rayo es absorbido la contribución es 0.
+
+
+
 
 \clearpage
 
