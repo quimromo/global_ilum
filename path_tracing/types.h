@@ -1,9 +1,13 @@
 
 
 #define PI		3.14159265f
+
 #include <optix.h>
 #include <optix_math.h>
 
+#ifndef DEG2RAD
+#define DEG2RAD 0.0174532925
+#endif
 
 struct PerRayData_radiance
 {

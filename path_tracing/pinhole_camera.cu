@@ -44,6 +44,7 @@ rtDeclareVariable(float3,        eye, , );
 rtDeclareVariable(float3,        U, , );
 rtDeclareVariable(float3,        V, , );
 rtDeclareVariable(float3,        W, , );
+rtDeclareVariable(float,		 viewd, , );
 rtDeclareVariable(float3,        bad_color, , );
 rtDeclareVariable(float,         scene_epsilon, , );
 rtBuffer<float3, 1>              output_buffer;
@@ -76,7 +77,7 @@ RT_PROGRAM void m_pinhole_camera()
   //float aspect_ratio = (float)launch_dim.x / launch_dim.y;
   d.x *= aspect_ratio;
   float3 ray_origin = eye;
-  float3 ray_direction = normalize(d.x*U + d.y*V + W);
+  float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
   
   optix::Ray ray = optix::make_Ray(ray_origin, ray_direction, radiance_ray_type, scene_epsilon, RT_DEFAULT_MAX);
 

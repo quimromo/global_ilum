@@ -79,7 +79,11 @@ Este algoritmo sobresale entre todos los demás cuando se trata de renderizar ca
 Este algoritmo, desarrollado por Keller en 1997, combina las ideas de los algoritmos de radiosity y photon mapping. Igual que el radiosity original, este algoritmo, en principio, solo funciona para superficies puramente difusas.
 
 \medskip
-La idea general consiste en lanzar fotones desde las fuentes de luz (como en foton mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX. 
+La idea general consiste en lanzar fotones desde las fuentes de luz (como en foton mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX.
+
+\medskip
+
+Además del algoritmo de instant radiosity básico existen modificaciones del mismo que combinan las ideas de los algoritmos de path tracing con el de instant radisioty. En este conjunto de algoritmos encontramos el instant radiosity bidireccional y el metropolis instant radiosity.  
 
 \subsection{Irrandiance caching}
 
@@ -129,6 +133,10 @@ Para ello, un primer objetivo necesario era estudiar los distintos algoritmos y 
 \medskip
 
 Una vez decidido el algoritmo, otro objetivo parcial necesario para alcanzar el objetivo primario es realizar un estudio teórico detallado del algoritmo en cuestión y de las tecnicas y conceptos relacionados con el mismo con tal de tener una comprensión del mismo lo bastante profunda como para realizar una implementación seria.
+
+\medskip
+
+Finalmente sera necesario plasmar los conocimientos teóricos adquiridos en una implementación de un renderizador con iluminación global. 
 
 
 

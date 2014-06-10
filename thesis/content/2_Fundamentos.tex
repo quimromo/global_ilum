@@ -305,13 +305,52 @@ Como en este trabajo estamos calculando la integral de la luz dispersada integra
 
 Para proceder de este modo sera necesario calcular el angulo solido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos usado fuentes de luz en forma de cúpula celestial, esféricas, paralelogramos y triángulos.
 
-\subsubsection{Cúpula}
 
 \subsubsection{Esfera}
 
-\subsubsection{Paralelogramo}
+Para el muestreo del angulo sólido subtendido por una luz esférica nos basaremos en el método propuesto en \cite{Shirley1996}.
 
-\subsubsection{Triangulo}
+\medskip
+
+En primero lugar tenemos que calcular el angulo solido en relación al punto $x$ subtendido por una esfera de radio $r$ centrada en $c$. Llamaremos $\theta_{max}$ al angulo entre la dirección del vector $c - x$ y una recta tangente a la esfera que pasa por $x$. Entonces
+
+\begin{equation}
+\cos \theta_{max} = \sqrt{1 - \sin^2 \theta_{max}} = \sqrt{ 1 - \left(\frac{r}{\lVert c - x \rVert} \right)^2 }
+\end{equation}
+
+Según la definición de angulo solido el angulo solido subtendido por la esfera en $x$ es:
+
+\begin{equation}
+\omega_x = 2\pi (1 - cos \theta_{max})
+\end{equation}
+
+La función de densidad de probabilidad de muestrear una dirección cualquiera $l$ dentro del angulo sólido sera la inversa del angulo solido subtendido es decir $p(l) = \frac{1}{\omega_x}$.
+
+\medskip
+
+Para obtener direcciones dentro del angulo sólido $\omega_x$ generamos dos números aleatorios $r_1$ y $r_2$ uniformemente en el rango $[0, 1]$, la dirección en coordenadas esféricas sera:
+
+\begin{equation}
+(\theta, \phi) = (\arccos (1 + r_1 (\cos \theta_{max} - 1)), 2\pi r_2);
+\end{equation}
+
+\clearpage
+
+Para obtener la dirección del vector $l$ en coordenadas absolutas creamos una base ortonormal $(u, v, w)$ con $w = \frac{c - x}{\lVert c - x \rVert}$ y multiplicamos la matriz de la base ortonormal por la representación en coordenadas cartesianas de la dirección que hemos obtenido.
+
+\begin{equation}
+l = \begin{pmatrix}
+u_x & v_x & w_x \\
+u_y & v_y & w_y \\
+u_z & v_z & w_z
+\end{pmatrix}
+\begin{pmatrix}
+\cos \phi \sin \theta \\
+\sin \phi \sin \theta \\
+\cos \theta
+\end{pmatrix}
+\end{equation}
+
 
 
 
