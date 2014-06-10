@@ -22,7 +22,7 @@
 #include <optix_world.h>
 #include "helpers.h"
 #include "random.h"
-#include "types.h"
+#include "device_funcs.h"
 
 using namespace optix;
 

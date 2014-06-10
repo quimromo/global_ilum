@@ -191,6 +191,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /i /e /y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonStructs.h" />
+    <ClInclude Include="device_funcs.h" />
     <ClInclude Include="DevilLoader.h" />
     <ClInclude Include="glm.h" />
     <ClInclude Include="helpers.h" />

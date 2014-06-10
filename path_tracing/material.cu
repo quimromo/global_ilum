@@ -1,5 +1,5 @@
 
-#include "types.h"
+#include "device_funcs.h"
 #include "commonStructs.h"
 #include "random.h"
 #include <optixu/optixu_math_namespace.h>

@@ -13,7 +13,7 @@
 #include <gl\GL.h>
 
 #include <direct.h>
-
+#include "types.h"
 typedef unsigned int Uint;
 
 float saturate(float x){
@@ -654,11 +654,12 @@ public:
 		using namespace optix;
 
 		
-		BasicLight lights[] = {
-			/*{ make_float3( -60.0f,  30.0f, -120.0f ), make_float3( 0.2f, 0.2f, 0.25f ), 0, 0 },
-			{ make_float3( -60.0f,   0.0f,  120.0f ), make_float3( 0.1f, 0.1f, 0.10f ), 0, 0 },*/
-			{ make_float3(  60.0f,  60.0f,   60.0f ), make_float3( 1.0f, 1.0f, 0.7f ), 1, 0 }
-		};
+		//BasicLight lights[] = {
+		//	/*{ make_float3( -60.0f,  30.0f, -120.0f ), make_float3( 0.2f, 0.2f, 0.25f ), 0, 0 },
+		//	{ make_float3( -60.0f,   0.0f,  120.0f ), make_float3( 0.1f, 0.1f, 0.10f ), 0, 0 },*/
+		//	{ make_float3(  60.0f,  60.0f,   60.0f ), make_float3( 1.0f, 1.0f, 0.7f ), 1, 0 }
+		//};
+	
 		/*
 		optix::Buffer light_buffer = m_context->createBuffer(RT_BUFFER_INPUT);
 		light_buffer->setFormat(RT_FORMAT_USER);
@@ -673,7 +674,7 @@ public:
 		Program diffuse_prg = m_context->createProgramFromPTXFile( ptxpath("gi_project", "m_obj_material.cu") , "diffuse" );
 		Program any_hit = m_context->createProgramFromPTXFile( ptxpath("gi_project", "m_obj_material.cu") , "any_hit_shadow" );
 		Material diffuse = m_context->createMaterial();
-		diffuse["is_dome"]->setInt(true);
+		diffuse["is_dome"]->setInt(false);
 		diffuse["dome_emission"]->setFloat(1.0f, 1.0f, 1.0f);
 		diffuse["max_direct_samples"]->setUint(10u);
 		diffuse["min_direct_samples"]->setUint(1u);
@@ -686,7 +687,7 @@ public:
 			const char* path = "m_triangle_mesh.cu.obj";
 			Program mesh_bounds = m_context->createProgramFromPTXFile(path, "mesh_bounds");
 			Program mesh_isect = m_context->createProgramFromPTXFile(path, "mesh_intersect");
-			ObjLoader loader( filename.c_str(), m_context, group, diffuse, true, "Sbvh", "Bvh", "refine", false );
+			ObjLoader loader( filename.c_str(), m_context, group, diffuse, true, "Sbvh", "Bvh", "refine", false);
 			loader.setBboxProgram(mesh_bounds);
 			loader.setIntersectProgram(mesh_isect);
 			loader.load();
@@ -705,12 +706,20 @@ public:
 		std::string sphere_ptx(ptxpath("gi_project", "sphere.cu"));
 		Program sphere_isect = m_context->createProgramFromPTXFile(sphere_ptx, "sphere_isect");
 		Program sphere_bounds = m_context->createProgramFromPTXFile(sphere_ptx, "sphere_bounds");
+		/*
 		Geometry sphere = m_context->createGeometry();
 		sphere->setPrimitiveCount(1u);
 		sphere->setBoundingBoxProgram( sphere_bounds );
 		sphere->setIntersectionProgram(sphere_isect);
 		sphere["center"]->setFloat(0.0f, 0.0f, 0.0f);
 		sphere["radius"]->setFloat(50.0f);
+		*/
+		Geometry sphereLight = m_context->createGeometry();
+		sphereLight->setPrimitiveCount(1u);
+		sphereLight->setBoundingBoxProgram(sphere_bounds);
+		sphereLight->setIntersectionProgram(sphere_isect);
+		sphereLight["center"]->setFloat(-5.0f, 7.0f, 4.0f );
+		sphereLight["radius"]->setFloat(1.0f);
 
 		/*
 		Geometry sphere2 = m_context->createGeometry();
@@ -719,7 +728,7 @@ public:
 		sphere2->setIntersectionProgram(sphere_isect);
 		sphere2["center"]->setFloat(0.0f, 3.0f, 0.0f);
 		sphere2["radius"]->setFloat(1.0f);
-
+		
 		
 		Geometry sphere3 = m_context->createGeometry();
 		sphere3->setPrimitiveCount(1u);
@@ -769,8 +778,10 @@ public:
 		Material diffuse_light = m_context->createMaterial();
 		Program diffuse_em = m_context->createProgramFromPTXFile( ptxpath("gi_project", "m_obj_material.cu") , "emitter" );
 		diffuse_light->setClosestHitProgram( 0, diffuse_em );
-		diffuse_light["emission"]->setFloat(1.0, 1.0, 1.0);
-		GeometryInstance light = m_context->createGeometryInstance(sphere, &diffuse_light, &diffuse_light+1);
+		diffuse_light["emission"]->setFloat(2.0, 2.0, 2.0);
+
+		//GeometryInstance light = m_context->createGeometryInstance(sphere, &diffuse_light, &diffuse_light+1);
+		GeometryInstance light = m_context->createGeometryInstance(sphereLight, &diffuse_light, &diffuse_light+1);
 		GeometryGroup light_group = m_context->createGeometryGroup();
 		light_group->setChildCount(1);
 		light_group->setChild(0, light);
@@ -784,6 +795,21 @@ public:
 		//all->setChild(2, specular_balls);
 		m_context["top_shadower"]->set(group);
 		m_context["top_object"]->set(all);
+
+
+		SphereLight lights[] = { 
+			{ optix::make_float3( 2.0f, 2.0f, 2.0f ), optix::make_float3(-5.0f, 7.0f, 4.0f ), 1 }
+		};
+
+		optix::Buffer light_buffer = m_context->createBuffer(RT_BUFFER_INPUT);
+		light_buffer->setFormat(RT_FORMAT_USER);
+		light_buffer->setElementSize(sizeof(SphereLight));
+		light_buffer->setSize( sizeof(lights)/sizeof(lights[0]) );
+		memcpy(light_buffer->map(), lights, sizeof(lights));
+		light_buffer->unmap();
+
+		m_context["spherical_lights"]->set(light_buffer);
+		
 
 	}
 
@@ -807,7 +833,7 @@ int main(int argc, char* argv[]){
 	SDL_GLContext maincontext;
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	maincontext = SDL_GL_CreateContext(window);
-	unsigned int sqrtspp = 10;
+	unsigned int sqrtspp = 20;
 	Pathtracer pt;
 	pt.init(width, height, sqrtspp, 100u);
 	pt.createObjGeometry();

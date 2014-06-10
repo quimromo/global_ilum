@@ -19,7 +19,7 @@
  * SUCH DAMAGES
  */
 
-#include "types.h"
+#include "device_funcs.h"
 #include "commonStructs.h"
 #include "random.h"
 #include <optix.h>
@@ -118,9 +118,10 @@ RT_PROGRAM void diffuse()
 		cosine_sample_hemisphere(r1, r2, p);
 		//p = sampleHemisphere(r1, r2);
 		
-		float3 v1, v2;
-		createONB(ffnormal, v1, v2);
-		float3 rd = normalize(v1 * p.x + v2 * p.y + ffnormal * p.z);
+		float3 u, v, w;
+		w = ffnormal;
+		createONB(ffnormal, u, v);
+		float3 rd = normalize(u * p.x + v * p.y + ffnormal * p.z);
 		
 		//float3 rd = sampleHemisphere(norm, r1, r2);
 		PerRayData_radiance diffuse_refl_prd;
@@ -183,21 +184,45 @@ RT_PROGRAM void diffuse()
 			direct_color /= num_samples;
 			color += direct_color;
 		}
-		/*
+		
 		for(int i = 0; i < spherical_lights.size(); ++i){
-			float3 light_dir = spherical_lights[i] - hit;
+			float3 light_dir = spherical_lights[i].center - hit;
 			float dist2 = dot(light_dir, light_dir);
 			float radius2 = spherical_lights[i].radius * spherical_lights[i].radius;
 			if(dist2 - radius2 < scene_epsilon){
 				continue;
 			}
+			unsigned int seed = prd_radiance.seed;
 			float cos_theta_max = sqrtf(1 - radius2/dist2);
-			float pdf = 1.0f / (2.0f * PI * (1.0f - cos_theta_max));
+			float inv_pdf = 2.0f * PI * (1.0f - cos_theta_max);
+			
+			float r1 = rnd(seed);
+			float r2 = rnd(seed);
 
+			float cos_theta = 1 + r1 * (cos_theta_max - 1);
+			float sin2theta = 1 - cos_theta * cos_theta;
+			float sin_theta = sqrtf(sin2theta);
+			float sin_phi = sinf(2 * PI * r2);
+			float cos_phi = cosf(2 * PI * r2);
+			//float3 dir = make_float3( sqrtf(sin2theta), cos_theta, 2 * PI * r2);
+			float3 w = normalize(light_dir);
+			float3 u, v;
+			createONB(w, u, v);
+			float3 dir = make_float3(u.x * cos_phi * sin_theta + v.x * sin_phi * sin_theta + w.x * cos_theta,
+									 u.y * cos_phi * sin_theta + v.y * sin_phi * sin_theta + w.y * cos_theta,
+									 u.z * cos_phi * sin_theta + v.z * sin_phi * sin_theta + w.z * cos_theta
+									);
 
+			if(dot(dir, ffnormal) < 0) continue;
+			PerRayData_shadow shadow_prd;
+			shadow_prd.contribution = spherical_lights[i].emission;
+			float delta = sqrtf(radius2 - sin2theta * dist2);
+			Ray shadow_ray = Ray( hit, dir, shadow_ray_type, scene_epsilon, cos_theta * length(light_dir) - delta );
+			rtTrace(top_object, shadow_ray, shadow_prd);
+			color += inv_pdf * Kd * shadow_prd.contribution * dot(dir, ffnormal);
 
 		}
-		*/
+		
 
 	}
 
