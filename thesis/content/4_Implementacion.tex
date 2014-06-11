@@ -1,1 +1,161 @@
 \chapter{Implementación}
+
+En este capitulo analizaremos la implementación realizada de los conceptos teóricos vistos hasta ahora y el uso practico de las tecnologías involucradas.
+
+\medskip
+
+El diseño de la aplicación esta basado en el patrón de software \emph{facade} con la idea de ofrecer una interfaz en C++ de tipo librería de alto nivel, reutilizable y fácil de usar, que permita realizar renderizados realistas sin tener que preocuparse de los detalles de bajo nivel relativos a OptiX y CUDA ni de todos los conceptos teóricos involucrados.
+
+\medskip
+
+Además sobre esta interfaz se ha construido un parser de escenas XML, para hacer aun mas sencillo el acto de configurar y crear escenas.
+
+\clearpage
+
+\section{Interfaz de programación}
+
+\subsection{Estructura TCamera}
+
+Este tipo de datos representa la cámara de la escena y encapsula todos los datos relativos a la cámara. Para construir un objeto de este tipo le pasamos la posición de la cámara, el posición del objetivo y el angulo de campo de visión.
+
+\subsection{TSphereLight}
+
+Esta estructura representa una luz esférica, tomando como parámetros la posición del centro de la esfera, su radio y una tripleta RGB representando su emisión de luz.
+
+\subsection{TObjModel}
+
+Es una estructura que representa un modelo 3D en formato .obj. Se construye pasándole la ruta del modelo. 
+
+\subsection{Clase CPathtracer}
+
+Este es el tipo de datos mas relevante de nuestra interfaz. Todos los datos relativos a la escena y al renderizado son finalmente encapsulados en un objeto de este tipo. Una vez configurado, es el responsable de cargar los programas de OptiX y construir el \emph{Context} de OptiX y controlar la ejecución del mismo.
+
+\subsection{Uso de la interfaz de programación}
+
+Para explicar el funcionamiento de la interfaz lo haremos mediante un sencillo ejemplo que contiene las clases y métodos principales de la interfaz.
+
+\definecolor{orange}{rgb}{1.0,0.5,0.2}
+\definecolor{purple}{rgb}{0.5,0.2,0.9}
+\definecolor{blue}{rgb}{0.0,0.0,0.8}
+\definecolor{green}{rgb}{0,0.7,0}
+\definecolor{black}{rgb}{0.0,0.0,0.0}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green},
+  commentstyle=\itshape\color{purple},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+
+\lstset{style=customc}
+
+\begin{lstlisting}
+CPathtracer pt;
+
+pt.setRenderSize(width, height);
+pt.setSqrtSamplesPerPixel(sqrtspp);
+pt.setBlockSize(200u);
+pt.setMaxDepth(7);
+
+
+pt.setCamera(TCamera(optix::make_float3(8.0, 9.0, 1.0), 
+		optix::make_float3(7.0, 9.0, 0.5), 60.0f));
+pt.addObjModel(
+		TObjModel("assets/dabrovic-sponza/sponza.obj"));
+pt.addLight(TSphereLight(optix::make_float3(2.0f, 2.0f, 2.0f),
+		optix::make_float3(0.0f, 5.0f, 0.0f), 1.0f));
+
+pt.prepare();
+pt.renderAllSamples();
+pt.saveToTGA("render_sponza.tga");
+\end{lstlisting}
+
+Este ejemplo sirve para ilustrar el funcionamiento de la interfaz con el motor de renderizado.
+Veamos el funcionamiento de este ejemplo:
+En primer lugar creamos una instancia de la clase CPathtracer para seguidamente especificar las dimensiones, en pixeles, de la imagen que vamos a renderizar usando el metodo \emph{void setRenderSize(unsigned int width, unsigned int height)}. 
+
+\medskip
+
+Seguidamente usamos la instrucción \emph{pt.setSqrtSamplesPerPixel(sqrtspp} para especificar el numero de muestras por pixel. El valor que toma este método es la raíz cuadrada del numero de muestras. Lo hacemos de este modo para asegurarnos de que la división de cada pixel se hará en regiones uniformes dividiendo el pixel en \emph{sqrtspp} filas y \emph{sqrtspp} columnas.
+
+\medskip
+
+En la siguiente linea, especificamos un tamaño aproximado de los bloques en los que dividiremos la imagen. Entraremos en mas detalle sobre este comportamiento en las secciones siguientes pero de momento quedémonos con la idea de que la instrucción \emph{pt.setBlockSize(200u);} le dice al renderizador que debe dividir la imagen en bloques de aproximadamente 200x200 pixels. 
+
+\medskip
+
+A continuación especificamos la profundidad de recursión máxima. Este valor equivale al numero de veces que un rayo rebotara por la escena antes de ser terminado. Hay que calibrar bien este valor ya que un valor muy bajo produciría una iluminación pobre de la escena y un valor demasiado alto incrementaría el tiempo de ejecución innecesariamente.
+
+\medskip
+
+Seguidamente le pasamos al pathtracer un objeto de tipo TCamara inicializado con los valores de posición, objetivo y angulo de visión deseado. Solo puede haber una cámara activa a la vez por lo que la clase CPathtracer siempre usara la ultima que le especifiquemos.
+
+\medskip
+
+Los métodos \emph{addObjModel} y \emph{addLight} añaden modelos .obj y luces a la escena. A diferencia de la cámara, podemos llamar a estos métodos tantas veces como queramos para añadir luces y geometría a la escena.
+
+\medskip
+
+El método \emph{prepare} toma todos los datos de configuración que hemos especificado anteriormente y los compila en un \emph{Context} de OptiX para poder empezar el proceso de renderizado.
+
+\medskip
+
+Usamos la instrucción \emph{pt.renderAllSamples()} para efectuar un renderizado completo, de la imagen que tomara tantas muestras como hayamos especificado, y por ultimo guardamos el resultado en una fichero TGA. Por simplicidad en este ejemplo hemos usado el método \emph{renderAllSample} pero también existe la opción de renderizadar solo una muestra por pixel por llamada con el método \emph{void renderNextSample()}, este método sera útil cuando queramos dar un feedback visual del progreso del renderizado, calculando una muestra y pintando en pantalla el resultado cada vez.
+
+\section{Renderizado por bloques}
+
+Durante el proceso de implementación nos encontramos con una dificultad cuando se trataba de renderizar escenas con muchos polígonos: el sistema operativo impone un limite al tiempo de ejecución de una llamada a la GPU de unos pocos segundos. Si llamábamos a la ejecución de un Context de OptiX contra toda la imagen, es decir con tantos CUDA threads como pixels, el sistema operativo paraba la ejecución antes de que esta terminara.
+
+\medskip
+
+La solución que encontramos fue dividir la imagen en bloques de menor tamaño y lanzar una ejecución del Context para cada uno de estos bloques. Es como pintar varias imágenes de menor tamaño y luego juntarlas, con la diferencia de que mantenemos un buffer en la memoria del device, del tamaño de la imagen final, para no tener que hacer transacciones de memoria entre el host y el device ya que esto reduciría notablemente el rendimiento.
+
+\clearpage
+
+\section{OptiX programs}
+
+En esta sección veremos los programas OptiX que implementan el algoritmo de path tracing.
+
+\subsection{Camera program}
+
+Este programa es el encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parametros necesarios para lanzar el rayo correcto.
+
+\begin{lstlisting}
+float2 offset = make_float2(offset_x, offset_y);
+float2 startSample = make_float2(launch_index) + offset 
+	+ make_float2(
+	(float)(currentSample%sqrtspp) * (1.0f/(float)sqrtspp),
+	(float)(currentSample/sqrtspp) * (1.0f/(float)sqrtspp)
+);
+
+float2 centerSample = make_float2(1.0f/float(2 * sqrtspp));
+float2 d = (startSample + centerSample) / make_float2(screen_dim.x, screen_dim.y) * 2.f - 1.f;
+
+d.x *= aspect_ratio;
+float3 ray_origin = eye;
+float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
+\end{lstlisting}
+El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él indice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel estamos pintando, en coordenadas absolutas de la imagen entera.
+
+\medskip
+
+Para que el muestreo múltiple de cada pixel proporcione antialiasing es necesario dividir el pixel en regiones y lanzar el rayo a través de la región que se corresponde con la muestra actual. Para calcular las coordenadas de la región actual lo hacemos a partir del parámetro currentSample y de la raiz cuadrada del total de muestras (la variable sqrtspp).
+
+\medskip
+
+Efectuados estos cálculos tenemos las coordenadas top-left absolutas de la región de pixel. A estas coordenadas le sumamos el valor de media región de pixel para que el rayo salga por el centro de dicha región, en vez de por su esquina superior-izquierda.
+
+\medskip
+
+En la variable d normalizamos esas coordenadas para obtener las coordenadas de pantalla correctas en el intervalo $[-1, 1]$. Corregimos la relación de aspecto de la imagen y calculamos la dirección del rayo resultante.
+
+
+
+
