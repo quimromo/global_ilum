@@ -11,6 +11,8 @@
 #include <gl\GL.h>
 
 #include <direct.h>
+#include "pugixml.hpp"
+
 #include "types.h"
 #include "utils.h"
 
@@ -332,7 +334,54 @@ void CPathtracer::destroy(){
 	m_context->destroy();
 }
 
+optix::float3 getFromString(const char* float3_str){
+
+	size_t len = strlen(float3_str);
+	if(len > 50 || len < 5) return optix::make_float3(0.0, 0.0, 0.0); 
+
+	char* value = new char[len];
+	strcpy(value, float3_str);
 	
+	optix::float3 result;
+	result.x = atof(strtok(value, " "));
+	result.y = atof(strtok(NULL, " "));
+	result.z = atof(strtok(NULL, " "));
+
+	return result;
+
+}
+
+int loadSceneFromXML(CPathtracer& pt, const char* xml_filename){
+
+	pugi::xml_document doc;
+	doc.load_file(xml_filename);
+	pugi::xml_node scene = doc.child("scene");
+	
+	
+	
+	pugi::xml_node camera_node = scene.child("camera");
+	optix::float3 pos = getFromString( camera_node.attribute("pos").value() );
+	optix::float3 target = getFromString( camera_node.attribute("target").value() );
+	float fov = camera_node.attribute("fov").as_float();
+
+	pt.setCamera(TCamera(pos, target, fov));
+
+	pugi::xml_node lights = scene.child("lights");
+	for(pugi::xml_node light = lights.child("sphere_light"); light != NULL; light = light.next_sibling("sphere_light")){
+		TSphereLight l;
+		l.center = getFromString(light.attribute("pos").value());
+		l.emission = getFromString(light.attribute("emission").value());
+		l.radius = light.attribute("radius").as_float();
+		pt.addLight(l);
+	}
+
+	pugi::xml_node meshes = scene.child("meshes");
+	for(pugi::xml_node obj_model = meshes.child("obj_model"); obj_model != NULL; obj_model = obj_model.next_sibling("obj_model")){
+		pt.addObjModel( TObjModel( obj_model.attribute("path").value() ) );
+	}
+
+	return 0;
+}
 
 
 int main(int argc, char* argv[]){
@@ -361,11 +410,14 @@ int main(int argc, char* argv[]){
 	pt.setSqrtSamplesPerPixel(sqrtspp);
 	pt.setBlockSize(200u);
 	pt.setMaxDepth(7);
+	
+	/*
 	pt.setCamera(TCamera(optix::make_float3(8.0, 9.0, 1.0), optix::make_float3(7.0, 9.0, 0.5), 60.0f));
-
 	pt.addObjModel(TObjModel("assets/dabrovic-sponza/sponza.obj"));
 	pt.addLight(TSphereLight(optix::make_float3(2.0f, 2.0f, 2.0f), optix::make_float3(0.0f, 5.0f, 0.0f), 1.0f));
+	*/
 
+	loadSceneFromXML(pt, "assets/scenes/test_scene.xml");
 	pt.prepare();
 
 	int current = 0;

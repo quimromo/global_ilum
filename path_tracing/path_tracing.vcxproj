@@ -189,6 +189,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /i /e /y</Command>
     <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="ObjLoader.cpp" />
     <ClCompile Include="Pathtracer.cpp" />
+    <ClCompile Include="pugixml.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +201,8 @@ xcopy "$(SolutionDir)assets" "$(OutDir)assets" /i /e /y</Command>
     <ClInclude Include="pathtracer_types.h" />
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="ObjLoader.h" />
+    <ClInclude Include="pugiconfig.hpp" />
+    <ClInclude Include="pugixml.hpp" />
     <ClInclude Include="random.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="utils.h" />
