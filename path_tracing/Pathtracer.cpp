@@ -445,7 +445,7 @@ int main(int argc, char* argv[]){
 	SDL_GLContext maincontext;
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	maincontext = SDL_GL_CreateContext(window);
-	unsigned int sqrtspp = 20;
+	unsigned int sqrtspp = 30;
 	CPathtracer pt;
 
 	pt.setRenderSize(width, height);
@@ -459,7 +459,8 @@ int main(int argc, char* argv[]){
 	pt.addLight(TSphereLight(optix::make_float3(2.0f, 2.0f, 2.0f), optix::make_float3(0.0f, 5.0f, 0.0f), 1.0f));
 	*/
 
-	loadSceneFromXML(pt, "assets/scenes/crytek_sponza_scene.xml");
+	//loadSceneFromXML(pt, "assets/scenes/crytek_sponza_scene.xml");
+	loadSceneFromXML(pt, "assets/scenes/sibenik_scene2.xml");
 	//pt.setSkyDomeEmission(optix::make_float3(2.0, 2.0, 2.0));
 	//pt.enableSkyDome();
 	pt.prepare();

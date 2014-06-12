@@ -243,7 +243,7 @@ RT_PROGRAM void diffuse()
 			float delta = sqrtf(radius2 - sin2theta * dist2);
 			Ray shadow_ray = Ray( hit, dir, shadow_ray_type, scene_epsilon, cos_theta * length(light_dir) - delta );
 			rtTrace(top_object, shadow_ray, shadow_prd);
-			color += inv_pdf * shadow_prd.contribution * dot(dir, ffnormal) * (Kd + Ks * fmaxf(dot(dir, perfect_specular), 0.0f));
+			color += inv_pdf * shadow_prd.contribution * dot(dir, ffnormal) * (Kd + Ks * powf(fmaxf(dot(dir, perfect_specular), 0.0f), phong_exp) );
 
 		}
 		

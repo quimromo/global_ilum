@@ -73,7 +73,7 @@ RT_PROGRAM void m_pinhole_camera()
 		);
 
   float2 centerSample = make_float2(1.0f/float(2 * sqrtspp));
-  float2 d = (startSample + centerSample) / make_float2(screen_dim.x, screen_dim.y) * 2.f - 1.f;
+  float2 d = ((startSample + centerSample) / make_float2(screen_dim.x, screen_dim.y)) * 2.f - 1.f;
   //float aspect_ratio = (float)launch_dim.x / launch_dim.y;
   d.x *= aspect_ratio;
   float3 ray_origin = eye;
