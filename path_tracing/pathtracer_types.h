@@ -13,6 +13,7 @@ struct TSphereLight{
 	TSphereLight(optix::float3 aemission, optix::float3 acenter, float aradius); 
 };
 
+
 struct TObjModel{
 
 	std::string filename;
@@ -51,7 +52,9 @@ class CPathtracer{
 	std::vector<TObjModel> models;
 	std::vector<TSphereLight> sphere_lights;
 	bool buffer_mapped;
-	
+	bool has_skydome;
+	optix::float3 sky_dome_emission;
+
 	unsigned int approx_block_size;
 	unsigned int max_depth;
 	unsigned int sqrt_spp;
@@ -71,7 +74,9 @@ class CPathtracer{
 public:
 
 	//CPathtracer();
-
+	void setSkyDomeEmission(optix::float3 sky_dome_emission);
+	void disableSkyDome();
+	void enableSkyDome();
 	void setRenderSize(unsigned int a_width, unsigned int a_height)		{ width = a_width; height = a_height;}
 	void setBlockSize(unsigned int a_approx_block_size)					{ approx_block_size = a_approx_block_size;}
 	void setSqrtSamplesPerPixel(unsigned int a_sqrt_spp)				{ sqrt_spp = a_sqrt_spp;}

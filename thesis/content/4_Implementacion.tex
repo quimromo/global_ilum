@@ -119,13 +119,35 @@ La solución que encontramos fue dividir la imagen en bloques de menor tamaño y
 
 \clearpage
 
-\section{OptiX programs}
+\section{Camara}
 
-En esta sección veremos los programas OptiX que implementan el algoritmo de path tracing.
+\subsection{Host}
 
-\subsection{Camera program}
+En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vetores de la base ortonormal del sistema de coordenadas de camara (front, left, up) y la relación (viewd) entre el vector front y el vector up en función del angulo de visión fov.
 
-Este programa es el encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parametros necesarios para lanzar el rayo correcto.
+\begin{lstlisting}
+TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
+{
+	is_ok = false;
+	if(afov <= 0.0f || afov >= 179.0f) return;
+
+	position = aposition;
+	target = atarget;
+	fov = afov;
+	viewd = 0.0f;
+
+	front = optix::normalize(target - position);
+	left = optix::normalize(optix::cross(optix::make_float3(0.0f, 1.0f, 0.0f), front));
+	up = optix::normalize(optix::cross(front, left));
+
+	viewd = 1.0 / tanf( fov * 0.5f * DEG2RAD);
+	is_ok = true;		
+}
+\end{lstlisting}
+
+\subsection{Device}
+
+En el device tenemos un programa encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parametros necesarios para lanzar el rayo correcto.
 
 \begin{lstlisting}
 float2 offset = make_float2(offset_x, offset_y);
@@ -156,6 +178,57 @@ Efectuados estos cálculos tenemos las coordenadas top-left absolutas de la regi
 
 En la variable d normalizamos esas coordenadas para obtener las coordenadas de pantalla correctas en el intervalo $[-1, 1]$. Corregimos la relación de aspecto de la imagen y calculamos la dirección del rayo resultante.
 
+\clearpage
+
+\section{Muestreo de la hemiesfera}
+
+En el programa de closest hit, muestreamos la hemiesfiera centrada en el punto de intersección para tener una estimación de la luz incidente.
+
+\begin{lstlisting}
+
+bool hit_light = false;
+if(prd_radiance.depth < max_depth){
+	unsigned int seed = prd_radiance.seed;
+	float r1 = rnd(seed);
+	float r2 = rnd(seed);
+	float3 p;
+	cosine_sample_hemisphere(r1, r2, p);
+	
+	float3 u, v;
+	createONB(ffnormal, u, v);
+	float3 rd = normalize(u * p.x + v * p.y + ffnormal * p.z);
+		
+	PerRayData_radiance diffuse_refl_prd;
+	diffuse_refl_prd.seed = seed;
+	diffuse_refl_prd.depth = prd_radiance.depth + 1;
+	diffuse_refl_prd.contribution *= Kd;
+	diffuse_refl_prd.is_light = false;
+	optix::Ray diffuse_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
+	rtTrace(top_object, diffuse_refl_ray, diffuse_refl_prd);
+	brdfLight = diffuse_refl_prd.result;
+	color += brdfLight * Kd;
+	hit_light = diffuse_refl_prd.is_light;
+}
+\end{lstlisting}
+
+Basicamente lo que hace es, en el caso de que no hayamos llegado a la profundidad de recursión máxima, muestrear un punto en la hemiesfiera con densidad de coseno, generar una base ortonormal en función de la normal de la superficie y transformar el punto de la hemiesfera con esa base. Se traza un rayo recursivamente en la dirección obtenida y el color devuelto por ese rayo se multiplica por el color difuso de la superficie.
+
+\medskip
+
+Hay que hacer notar que en la instrucción \emph{color += brdfLight * Kd;} no estamos multiplicando por el típico factor coseno de la normal y la luz. No lo hacemos porque al tomar la muestra con densidad coseno y dividir entre la densidad de probabilidad de esa muestra los factores coseno se anulan.
+Siguiendo con ese razonamiento y teniendo en cuenta que la densidad coseno es $\frac{cos(l,n)}{\pi}$ deberíamos multiplicar el resultado por $\pi$ para ser coherentes con la teoría pero lo hemos quitado del cálculo porque hemos comprobado empíricamente que el resultado final es mas satisfactorio sin ese factor, que en caso de incluirlo en el cálculo generaba imágenes excesivamente iluminadas y quemadas.
+
+\medskip
+
+Usando tan solo esta función de iluminación ya es posible generar renderizados aunque al no muestrear las luces directamente tardaran mas en converger.
+En las primeras fases de la implementación realizamos algunos renderizados con este closest hit program, y un closest hit program para las fuentes de luz que devolvía su emisión de luz.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=2in]{Solid_Angle.png}
+\caption{Definición de angulo solido \cite{Haade}}
+\end{figure}
 
 
 

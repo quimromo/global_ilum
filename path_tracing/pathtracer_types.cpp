@@ -50,6 +50,7 @@ TCamera::TCamera() :
 
 TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
 {
+	is_ok = false;
 	if(afov <= 0.0f || afov >= 179.0f) return;
 
 	position = aposition;

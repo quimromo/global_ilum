@@ -60,4 +60,18 @@ static __device__ __inline__ float3 sample_specular(float phong_exp, float rnd1,
 	return make_float3(x,y,z);
 
 }
+
+static __device__ __inline__ float3 sample_specular2(float phong_exp, float rnd1, float rnd2){
+	
+	float cosTheta = powf(rnd1, 1.0f/(phong_exp + 1.0f));
+	float sinTheta = sqrtf(1 - cosTheta * cosTheta);
+	float phi = 2.0 * rnd2 * PI;
+	float x = cosf(phi)*sinTheta;
+	float y = sinf(phi)*sinTheta;
+	float z = cosTheta;
+
+	return normalize(make_float3(x,y,z));
+
+}
+
 //static __device__ __inline__ float solidAngleSubtendedByPoligon(

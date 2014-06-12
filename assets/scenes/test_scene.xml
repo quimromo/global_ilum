@@ -3,9 +3,9 @@
 	<camera pos="8.9218 9.7495 1.0665" target="8.0 9.5 0.7" fov="70.0"/>
 	
 	<lights>
-		<sphere_light pos="-5.0 7.0 4.3" emission="2.0 2.0 2.0" radius="1.0"/>
-		<sphere_light pos="-5.0 3.0 -4.3" emission="2.0 2.0 2.0" radius="1.0"/>
-		<sphere_light pos="5.0 7.0 4.3" emission="2.0 2.0 2.0" radius="1.0"/>
+		<sphere_light pos="-5.0 7.0 4.3" emission="1.0 1.0 1.0" radius="1.0"/>
+		<sphere_light pos="-5.0 3.0 -4.3" emission="1.0 1.0 1.0" radius="1.0"/>
+		<sphere_light pos="5.0 7.0 4.3" emission="1.0 1.0 1.0" radius="1.0"/>
 	
 	</lights>
 	

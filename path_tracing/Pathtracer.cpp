@@ -34,6 +34,18 @@ void CPathtracer::renderAllSamples(){
 	}
 
 }
+
+void CPathtracer::enableSkyDome(){
+	has_skydome = true;
+}
+
+void CPathtracer::disableSkyDome(){
+	has_skydome = true;
+}
+
+void CPathtracer::setSkyDomeEmission(optix::float3 emission){
+	sky_dome_emission = emission;
+}
 	
 void CPathtracer::renderNextSample(){
 
@@ -199,16 +211,22 @@ void CPathtracer::prepare(){
 	optix::Program mesh_bounds = m_context->createProgramFromPTXFile(path, "mesh_bounds");
 	optix::Program mesh_isect = m_context->createProgramFromPTXFile(path, "mesh_intersect");
 
+	optix::float3 scene_min = optix::make_float3(0.0f);
+	optix::float3 scene_max = optix::make_float3(0.0f);
+
 	for(int i = 0; i < models.size(); ++i){
 
 		optix::GeometryGroup group = m_context->createGeometryGroup();
 		optix::Material diffuse = m_context->createMaterial();
 		
-		//diffuse["is_dome"]->setInt(false);
-		//diffuse["dome_emission"]->setFloat(1.0f, 1.0f, 1.0f);
-		//diffuse["max_direct_samples"]->setUint(10u);
-		//diffuse["min_direct_samples"]->setUint(1u);
-		
+		if(has_skydome){
+			diffuse["is_dome"]->setInt(1);
+			diffuse["dome_emission"]->setFloat(sky_dome_emission);
+		}
+		else{
+			diffuse["is_dome"]->setInt(0);
+		}
+
 		diffuse->setClosestHitProgram(0, diffuse_prg);
 		diffuse->setAnyHitProgram(1, any_hit); 
 		std::string filename = models[i].filename;
@@ -222,6 +240,8 @@ void CPathtracer::prepare(){
 			optix::Aabb aabb = loader.getSceneBBox();
 			std::cout << "Object aabb.min = (" << aabb.m_min.x << ", " << aabb.m_min.y << ", " << aabb.m_min.z << ")" << std::endl;
 			std::cout << "Object aabb.max = (" << aabb.m_max.x << ", " << aabb.m_max.y << ", " << aabb.m_max.z << ")" << std::endl;
+			scene_max = optix::fmaxf(aabb.m_max, scene_max);
+			scene_min = optix::fminf(aabb.m_min, scene_min);
 		}
 		else{
 			std::cout << "can't load " << filename << " EXIT" << std::endl;
@@ -231,10 +251,16 @@ void CPathtracer::prepare(){
 		obj_models_group->setChild(i, group);
 
 	}
+
+	optix::Aabb scene_aabb;
+	scene_aabb.set(scene_min, scene_max);
+	float dome_radius = optix::length(scene_aabb.extent()) * 2;
 	
 	optix::GeometryGroup light_group = m_context->createGeometryGroup();
 	light_group->setAcceleration(m_context->createAcceleration("Sbvh", "Bvh"));
-	light_group->setChildCount(sphere_lights.size());
+	unsigned childs = sphere_lights.size();
+	if(has_skydome) childs++;
+	light_group->setChildCount(childs);
 
 	std::cout << "lights size: " << sphere_lights.size() << std::endl;
 
@@ -261,6 +287,22 @@ void CPathtracer::prepare(){
 
 		light_group->setChild(i, light);
 
+	}
+
+	if(has_skydome){
+		optix::Geometry sphereLight = m_context->createGeometry();
+		sphereLight->setPrimitiveCount(1u);
+		sphereLight->setBoundingBoxProgram(sphere_bounds);
+		sphereLight->setIntersectionProgram(sphere_isect);
+		sphereLight["center"]->setFloat(optix::make_float3(0.0f, 0.0f, 0.0f));
+		sphereLight["radius"]->setFloat(dome_radius );
+
+		optix::Material diffuse_light = m_context->createMaterial();
+		
+		diffuse_light->setClosestHitProgram( 0, diffuse_em );
+		diffuse_light["emission"]->setFloat(sky_dome_emission);
+		optix::GeometryInstance light = m_context->createGeometryInstance(sphereLight, &diffuse_light, &diffuse_light+1);
+		light_group->setChild(sphere_lights.size(), light);
 	}
 
 
@@ -389,7 +431,7 @@ int main(int argc, char* argv[]){
 	char dirPath[200];
 	_getcwd(dirPath, sizeof(dirPath));
 	std::cout << dirPath << std::endl;
-	unsigned int width  = 1024;
+	unsigned int width  = 1280;
 	unsigned int height = 768;
 	SDL_Init(SDL_INIT_VIDEO);
 	
@@ -403,12 +445,12 @@ int main(int argc, char* argv[]){
 	SDL_GLContext maincontext;
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	maincontext = SDL_GL_CreateContext(window);
-	unsigned int sqrtspp = 10;
+	unsigned int sqrtspp = 20;
 	CPathtracer pt;
 
 	pt.setRenderSize(width, height);
 	pt.setSqrtSamplesPerPixel(sqrtspp);
-	pt.setBlockSize(200u);
+	pt.setBlockSize(300u);
 	pt.setMaxDepth(7);
 	
 	/*
@@ -417,7 +459,9 @@ int main(int argc, char* argv[]){
 	pt.addLight(TSphereLight(optix::make_float3(2.0f, 2.0f, 2.0f), optix::make_float3(0.0f, 5.0f, 0.0f), 1.0f));
 	*/
 
-	loadSceneFromXML(pt, "assets/scenes/test_scene.xml");
+	loadSceneFromXML(pt, "assets/scenes/crytek_sponza_scene.xml");
+	//pt.setSkyDomeEmission(optix::make_float3(2.0, 2.0, 2.0));
+	//pt.enableSkyDome();
 	pt.prepare();
 
 	int current = 0;
@@ -437,16 +481,17 @@ int main(int argc, char* argv[]){
 	}
 
 	std::stringstream ss;
-	ss << "test_" << currentDateTime() << "_" << sqrtspp * sqrtspp << "spp.tga"; 
+	ss << "render_" << currentDateTime() << "_" << sqrtspp * sqrtspp << "spp.tga"; 
 	//pt.saveToTGA( ("test_" + currentDateTime() +  ".tga").c_str());
 	
 	SDL_DestroyWindow(window);
 	
 	pt.saveToTGA( (ss.str()).c_str());
+	pt.destroy();
 	int p;
 	std::cin >> p;
 	SDL_Quit();
-	pt.destroy();
+	
 	return 0;
 }
 

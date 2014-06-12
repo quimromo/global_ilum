@@ -1,0 +1,17 @@
+<scene name="crytek_sponza_scene">
+	
+	<camera pos="500.9218 700.7495 -100.0665" target="-400.0 300.5 100.7" fov="75.0"/>
+	
+	<lights>
+		<sphere_light pos="-500.0 200.0 400.3" emission="8.0 8.0 8.0" radius="65.0"/>
+		<sphere_light pos="-400.0 700.0 -400.3" emission="8.0 8.0 8.0" radius="65.0"/>
+		<sphere_light pos="500.0 200.0 -400.3" emission="8.0 8.0 8.0" radius="65.0"/>
+	
+	</lights>
+	
+	<meshes>
+		<obj_model path="assets/crytek-sponza/crytek-sponza/sponza.obj"/>
+		
+	</meshes>
+
+</scene>

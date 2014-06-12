@@ -91,19 +91,24 @@ RT_PROGRAM void diffuse()
   */
   
   
-  float3 ffnormal               = normalize(faceforward( world_shading_normal, -direction, world_geometric_normal ));
-  
+	float3 ffnormal               = normalize(faceforward( world_shading_normal, -direction, world_geometric_normal ));
+ 
+	float3 black = make_float3(0.0f, 0.0f, 0.0f);
 
-  float3 black = make_float3(0.0f, 0.0f, 0.0f);
+	float3 Kd = make_float3( tex2D( diffuse_map,  uv.x, uv.y ) );
+	float3 Ks = make_float3( tex2D( specular_map, uv.x, uv.y ) );
 
-  // grab values from textures
-  // support only MTL illumination modes 0-3 (Ks is for now used as reflectivity)
-  // ( see http://local.wasp.uwa.edu.au/~pbourke/dataformats/mtl/ )
-  float3 Kd =                       make_float3( tex2D( diffuse_map,  uv.x, uv.y ) );
-  //float3 Ka = (illum < 1) ? black : make_float3( tex2D( ambient_map,  uv.x, uv.y ) );
-  //float3 Ks = (illum < 2) ? black : make_float3( tex2D( specular_map, uv.x, uv.y ) );
-  //float3 Kr = (illum < 3) ? black : Ks;
-  
+	float prob_diff = (Kd.x + Kd.y + Kd.z) / 3.0f;
+	float prob_spec = (Ks.x + Ks.y + Ks.z) / 3.0f;
+	float total_prob = prob_diff + prob_spec; 
+	if( total_prob > 1.0f){
+		prob_diff /= total_prob;
+		prob_spec /= total_prob;
+		Kd /= total_prob;
+		Ks /= total_prob;
+		total_prob = 1.0f;
+	}
+
   	// diffuse reflection
 	float3 color = make_float3(0.0);
 	float3 brdfLight = make_float3(0.0);
@@ -112,38 +117,58 @@ RT_PROGRAM void diffuse()
 	bool hit_light = false;
 	if(prd_radiance.depth < max_depth){
 		unsigned int seed = prd_radiance.seed;
+		float rnd_event = rnd(seed);
 		float r1 = rnd(seed);
 		float r2 = rnd(seed);
 		float3 p;
-		cosine_sample_hemisphere(r1, r2, p);
-		//p = sampleHemisphere(r1, r2);
+		float3 u, v;
+		if(rnd_event <= prob_spec){
+			float3 eye = -ray.direction;
+			float3 perfect_specular = normalize(2.0 * ffnormal * dot(ffnormal, eye) - eye);
+			createONB(perfect_specular, u, v);
+			p = sample_specular2(phong_exp, r1, r2);
+			float3 rd = normalize(u * p.x + v * p.y + perfect_specular * p.z);
+			if(dot(rd, ffnormal) > 0.0f){
+				PerRayData_radiance specular_refl_prd;
+				specular_refl_prd.seed = seed;
+				specular_refl_prd.depth = prd_radiance.depth + 1;
+				specular_refl_prd.contribution *= Ks;
+				specular_refl_prd.is_light = false;
+				optix::Ray specular_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
+				rtTrace(top_object, specular_refl_ray, specular_refl_prd);
+				brdfLight = specular_refl_prd.result;// * dot(norm, rd);
+				hit_light = specular_refl_prd.is_light;
+				
+				color += ( brdfLight * Ks * (phong_exp + 2) * dot(rd, ffnormal) ) / ( (phong_exp + 1) * prob_spec );
+			}
+
+		}
+		else if(rnd_event <= total_prob){
+
+			cosine_sample_hemisphere(r1, r2, p);
+			createONB(ffnormal, u, v);
+			float3 rd = normalize(u * p.x + v * p.y + ffnormal * p.z);
+			PerRayData_radiance diffuse_refl_prd;
+			diffuse_refl_prd.seed = seed;
+			diffuse_refl_prd.depth = prd_radiance.depth + 1;
+			diffuse_refl_prd.contribution *= Kd;
+			diffuse_refl_prd.is_light = false;
+			optix::Ray diffuse_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
+			rtTrace(top_object, diffuse_refl_ray, diffuse_refl_prd);
+			brdfLight = diffuse_refl_prd.result;// * dot(norm, rd);
+			hit_light = diffuse_refl_prd.is_light;
+			color += brdfLight * Kd / prob_diff;
+		}
+
 		
-		float3 u, v, w;
-		w = ffnormal;
-		createONB(ffnormal, u, v);
-		float3 rd = normalize(u * p.x + v * p.y + ffnormal * p.z);
 		
-		//float3 rd = sampleHemisphere(norm, r1, r2);
-		PerRayData_radiance diffuse_refl_prd;
-		diffuse_refl_prd.seed = seed;
-		diffuse_refl_prd.depth = prd_radiance.depth + 1;
-		diffuse_refl_prd.contribution *= Kd;
-		diffuse_refl_prd.is_light = false;
-		optix::Ray diffuse_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
-		rtTrace(top_object, diffuse_refl_ray, diffuse_refl_prd);
-		brdfLight = diffuse_refl_prd.result;// * dot(norm, rd);
-		color += brdfLight * Kd;// / diffuse_refl_prd.dist;// * diffuse_refl_prd.dist); // * dot(ffnormal, rd);// / (diffuse_refl_prd.dist*diffuse_refl_prd.dist);
-		hit_light = diffuse_refl_prd.is_light;
+		
 	}
 
 	if(!hit_light){
-
-		if(is_dome){
+		float3 perfect_specular = normalize(2.0 * ffnormal * dot(ffnormal, -ray.direction) + ray.direction);
+		if(is_dome == 1){
 			float3 direct_color = make_float3(0.0);
-			float contrib = (prd_radiance.contribution.x + prd_radiance.contribution.y + prd_radiance.contribution.z) / 3.0f;
-			unsigned int num_samples = (unsigned int)fmaxf(contrib * (float)max_direct_samples, (float)min_direct_samples);
-			//unsigned int num_samples = 20u;
-			for(unsigned int i = 0; i < num_samples; ++i){
 				unsigned int seed = prd_radiance.seed;
 				float r1 = rnd(seed);
 				float r2 = rnd(seed);
@@ -172,16 +197,15 @@ RT_PROGRAM void diffuse()
 				float3 v1, v2;
 				createONB(ffnormal, v1, v2);
 				float3 rd = normalize(v1 * p.x + v2 * p.y + ffnormal * p.z);
-				if(dot(rd, ffnormal) < 0.0f) rd *= -1;
+				//if(dot(rd, ffnormal) < 0.0f) rd *= -1;
 				PerRayData_shadow shadow_prd;
 				shadow_prd.contribution = make_float3(1.0f);
 				Ray shadow_ray = Ray( hit, rd, shadow_ray_type, scene_epsilon);
 				rtTrace(top_object, shadow_ray, shadow_prd);
 				direct_color +=  shadow_prd.contribution;// * dot(rd, ffnormal);
 
-			}
-			direct_color *= Kd * PI * dome_emission;
-			direct_color /= num_samples;
+			
+			direct_color *= Kd * dome_emission;
 			color += direct_color;
 		}
 		
@@ -219,7 +243,7 @@ RT_PROGRAM void diffuse()
 			float delta = sqrtf(radius2 - sin2theta * dist2);
 			Ray shadow_ray = Ray( hit, dir, shadow_ray_type, scene_epsilon, cos_theta * length(light_dir) - delta );
 			rtTrace(top_object, shadow_ray, shadow_prd);
-			color += inv_pdf * Kd * shadow_prd.contribution * dot(dir, ffnormal);
+			color += inv_pdf * shadow_prd.contribution * dot(dir, ffnormal) * (Kd + Ks * fmaxf(dot(dir, perfect_specular), 0.0f));
 
 		}
 		

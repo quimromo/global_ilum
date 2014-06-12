@@ -1,0 +1,15 @@
+<scene name="sibenik_scene">
+	
+	<camera pos="-17.475 -10.186 1.7658" target="-16.475 -10.420 1.60" fov="70.0"/>
+	
+	<lights>
+		<sphere_light pos="6.33412 -3.75409 -1.66251" emission="3.0 3.0 3.0" radius="1.5"/>
+	
+	</lights>
+	
+	<meshes>
+		<obj_model path="assets/sibenik/sibenik.obj"/>
+		
+	</meshes>
+
+</scene>
