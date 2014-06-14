@@ -109,6 +109,8 @@ El método \emph{prepare} toma todos los datos de configuración que hemos espec
 
 Usamos la instrucción \emph{pt.renderAllSamples()} para efectuar un renderizado completo, de la imagen que tomara tantas muestras como hayamos especificado, y por ultimo guardamos el resultado en una fichero TGA. Por simplicidad en este ejemplo hemos usado el método \emph{renderAllSample} pero también existe la opción de renderizadar solo una muestra por pixel por llamada con el método \emph{void renderNextSample()}, este método sera útil cuando queramos dar un feedback visual del progreso del renderizado, calculando una muestra y pintando en pantalla el resultado cada vez.
 
+\clearpage
+
 \section{Renderizado por bloques}
 
 Durante el proceso de implementación nos encontramos con una dificultad cuando se trataba de renderizar escenas con muchos polígonos: el sistema operativo impone un limite al tiempo de ejecución de una llamada a la GPU de unos pocos segundos. Si llamábamos a la ejecución de un Context de OptiX contra toda la imagen, es decir con tantos CUDA threads como pixels, el sistema operativo paraba la ejecución antes de que esta terminara.
@@ -266,6 +268,7 @@ En el caso de la parte especular usamos como densidad de probabilidad una potenc
 
 \end{lstlisting}
 
+\clearpage
 
 \section{Muestreo de luces}
 
@@ -273,9 +276,59 @@ Una mejora importante que hemos implementado ha sido el muestreo directo de fuen
 
 \begin{lstlisting}
 
+for(int i = 0; i < spherical_lights.size(); ++i){
+	float3 light_dir = spherical_lights[i].center - hit;
+	float dist2 = dot(light_dir, light_dir);
+	float radius2 = spherical_lights[i].radius * spherical_lights[i].radius;
+	if(dist2 - radius2 < scene_epsilon){
+		continue;
+	}
+	unsigned int seed = prd_radiance.seed;
+	float cos_theta_max = sqrtf(1 - radius2/dist2);
+	float inv_pdf = 2.0f * PI * (1.0f - cos_theta_max);
+	
+	float r1 = rnd(seed);
+	float r2 = rnd(seed);
+	float cos_theta = 1 + r1 * (cos_theta_max - 1);
+	float sin2theta = 1 - cos_theta * cos_theta;
+	float sin_theta = sqrtf(sin2theta);
+	float sin_phi = sinf(2 * PI * r2);
+	float cos_phi = cosf(2 * PI * r2);
+	float3 w = normalize(light_dir);
+	float3 u, v;
+	createONB(w, u, v);
+	float3 dir = normalize( u * cos_phi * sin_theta + v * sin_phi * sin_theta + w * cos_theta );
 
+	if(dot(dir, ffnormal) < 0) continue;
+	PerRayData_shadow shadow_prd;
+	shadow_prd.contribution = spherical_lights[i].emission;
+	float delta = sqrtf(radius2 - sin2theta * dist2);
+	Ray shadow_ray = Ray( hit, dir, shadow_ray_type, scene_epsilon, cos_theta * length(light_dir) - delta );
+	rtTrace(top_object, shadow_ray, shadow_prd);
+	color += inv_pdf * shadow_prd.contribution * dot(dir, ffnormal) * (Kd + Ks * powf(fmaxf(dot(dir, perfect_specular), 0.0f), phong_exp) );
 
+}
 \end{lstlisting}
+
+Para cada luz esférica calculamos la distancia del punto que estamos evaluando al centro de la esfera y en caso de encontrarnos dentro de la misma la omitimos y continuamos con la siguiente.
+
+\medskip
+
+
+A continuación procedemos a generar una dirección dentro del angulo sólido subtendido por la esfera, tal como se ha explicado en la sección \ref{sample_solid}. Si dicha dirección forma un angulo superior a noventa grados con respecto a la normal la omitimos.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=1.0]{sample_esfera.pdf}
+\caption{  $\Delta $ al punto de intersección}
+\end{figure}
+
+La distancia a la que se encuentra el primer punto de intersección de la esfera con el rayo será $d_{intersect} = d \cos\theta - \Delta $. Este valor $\Delta = \sqrt{r^2 - (d\sin\theta)^2}$ lo calculamos en la instrucción \emph{float delta = sqrtf(radius2 - sin2theta * dist2);}. De este modo cuando creemos el rayo lo haremos con una distancia máxima que es la que nos interesa con tal de que no interseccione con objetos que estén dentro o detrás de la esfera. En las lineas 29 y 30 creamos y lanzamos el rayo. El valor \emph{shadow\_prd.contribution} será la emision de luz de la fuente que estamos muestreando o $0$ si ha interseccionado con algun objeto.
+
+\medskip
+
+Finalmente en la ultima linea calculamos la contribución de luz de la muestra evaluando la BRDF.
+
 
 
 

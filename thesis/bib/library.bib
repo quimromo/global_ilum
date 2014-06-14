@@ -1,3 +1,13 @@
+@inproceedings{Appel1968,
+abstract = {Some applications of computer graphics require a vivid illusion of reality. These include the spatial organization of machine parts, conceptual architectural design, simulation of mechanisms, and industrial design. There has been moderate success in the automatic generation of wire frame, cardboard model, polyhedra, and quadric surface line drawings. The capability of the machine to generate vivid sterographic pictures has been demonstrated. There are, however considerable reasons for developing techniques by which line drawings of solids can be shaded, especially the enhancement of the sense of solidity and depth. Figures 1 and 2 illustrate the value of shading and shadow casting in spatial description. In the line drawing there is no clue as to the relative position of the flat plane and the sheet metal console. When shadows are rendered, it is clear that the plane is below and to the rear of the console, and the hollow nature of the sheet metal assembly is emphasized. Shading can specify the tone or color of a surface and the amount of light falling upon that surface from one or more light sources. Shadows when sharply defined tend to suggest another viewpoint and improves surface definition. When controlled, shading can also emphasize particular parts of the drawing. If techniques for the automatic determination of chiaroscuro with good resolution should prove to be competitive with line drawings, and this is a possibility, machine generated photographs might replace line drawings as the principal mode of graphical communication in engineering and architecture.},
+author = {Appel, Arthur},
+booktitle = {Proceedings of the April 30–May 2, 1968, spring joint computer conference},
+doi = {10.1145/1468075.1468082},
+pages = {37--45},
+title = {{Some techniques for shading machine renderings of solids}},
+url = {http://doi.acm.org/10.1145/1468075.1468082},
+year = {1968}
+}
 @misc{Ashikhmin2000,
 abstract = {We present a BRDF model that combines several advantages of the various empirical models currently in use. In particular, it has intuitive parameters, is anisotropic, conserves energy, is reciprocal, has an appropriate non-Lambertian diffuse term, and is well-suited for use in Monte Carlo renderers.},
 author = {Ashikhmin, Michael and Shirley, Peter},
@@ -21,6 +31,19 @@ title = {{Distributed ray tracing}},
 url = {http://dl.acm.org/citation.cfm?id=808590},
 volume = {18},
 year = {1984}
+}
+@techreport{Dutre2003,
+abstract = {This collection of formulas and equations is supposed to be useful for anyone who is active in the field of global illumination in computer graphics. I started this document as a helpful tool to my own research, since I was growing tired of having to look up equations and formulas in various books and papers. As a consequence, many concepts which are ‘trivial’ to me are not in this Global Illumination Compendium , unless someone specifically asked for them. There- fore, any further input and suggestions for mo re useful content are strongly appreciated.},
+author = {Dutr\'{e}, Philip},
+booktitle = {The Journal of infectious diseases},
+doi = {10.1093/infdis/jiu169},
+issn = {1537-6613},
+pages = {NP},
+pmid = {24664901},
+title = {{Global Illuminat ion Compendium}},
+url = {http://www.cs.kuleuven.ac.be/~phil/GI/},
+volume = {209},
+year = {2003}
 }
 @misc{Goral1984,
 abstract = {A method is described which models the interaction of light between diffusely reflecting surfaces. Current light reflection models used in computer graphics do not account for the object-to-object reflection between diffuse surfaces, and thus incorrectly compute the global illumination effects. The new procedure, based on methods used in thermal engineering, includes the effects of diffuse light sources of finite area, as well as the color-bleeding effects which are caused by the diffuse reflections. A simple environment is used to illustrate these simulated effects and is presented with photographs of a physical model. The procedure is applicable to environments composed of ideal diffuse reflectors and can account for direct illumination from a variety of light sources. The resultant surface intensities are independent of observer position, and thus environments can be preprocessed for dynamic sequences.},
@@ -73,6 +96,20 @@ url = {http://dl.acm.org/citation.cfm?id=15901},
 volume = {20},
 year = {1986}
 }
+@article{Jensen1996,
+abstract = {This paper presents a two pass global illumination method based on the concept of photon maps. It represents a significant improvement of a previously described approach both with respect to speed, accuracy and versatility. In the first pass two photon maps are created by emitting packets of energy (photons) from the light sources and storing these as they hit surfaces within the scene. We use one high resolution caustics photon map to render caustics that are visualized directly and one low resolution photon map that is used during the rendering step. The scene is rendered using a distribution ray tracing algorithm optimized by using the in- formation in the photon maps. Shadow photons are used to render shadows more efficiently and the directional information in the photon map is used to generate optimized sampling directions and to limit the recursion in the distribution ray tracer by providing an estimate of the radiance on all surfaces with the exception of specular and highly glossy surfaces. The results presented demonstrate global illumination in scenes containing pro- cedural objects and surfaces with diffuse and glossy reflection models. The imple- mentation is also compared with the Radiance program.},
+author = {Jensen, Hw},
+doi = {citeulike-article-id:840855},
+file = {:C$\backslash$:/Users/S550C/Desktop/TFG/papers/global\_illumination\_using\_photon\_maps\_egwr96.pdf:pdf},
+isbn = {3-211-82883-4},
+journal = {Rendering Techniques' 96},
+keywords = {global illumination,monte carlo ray trac-,photon maps},
+pages = {21--30},
+title = {{Global illumination using photon maps}},
+url = {http://link.springer.com/chapter/10.1007/978-3-7091-7484-5\_3},
+volume = {96},
+year = {1996}
+}
 @article{Kajiya1986,
 author = {Kajiya, JT},
 file = {:C$\backslash$:/Users/S550C/Desktop/TFG/papers/p143-kajiya.pdf:pdf},
@@ -85,6 +122,20 @@ title = {{The rendering equation}},
 url = {http://dl.acm.org/citation.cfm?id=15902},
 volume = {20},
 year = {1986}
+}
+@article{Keller1997,
+abstract = {We present a fundamental procedure for instant rendering from the radiance equation. Operating directly on the textured scene description, the very efficient and simple algorithm produces photorealistic images without any finite element kernel or solution discretization of the underlying integral equation. Rendering rates of a few seconds are obtained by exploiting graphics hardware, the deterministic technique of the quasi-random walk for the solution of the global illumination problem, and the new method of jittered low discrepancy sampling.},
+author = {Keller, Alexander},
+doi = {10.1145/258734.258769},
+isbn = {0897918967},
+issn = {00978930},
+journal = {Proceedings of the 24th annual conference on Computer graphics and interactive techniques SIGGRAPH 97},
+keywords = {accumulation buffer,hardware,integration,jit,monte carlo,photorealism,quasi monte carlo integration,quasi random walk,radiance equation,radiosity,realtime rendering algorithms,shading,tered low discrepancy sampling},
+pages = {49--56},
+title = {{Instant radiosity}},
+url = {http://portal.acm.org/citation.cfm?doid=258734.258769},
+volume = {31},
+year = {1997}
 }
 @techreport{Lafortune1994,
 abstract = {This text discusses a few aspects opf reflectance models in physically based rendering: The first section presents the definition of the brdf of a surface and its physical properties On a more practical level, the next section discusses models to repesent brdfs and their desired properties for Monte Carlo algorithms The this section goes into details about a specific reflectance model, the modified Phong brdf, with its definition, its properties and its use. We show how this model can be correctly integrated in importance sampling schemes for physically based Monte Carlo rendering algorithms The fourth section is devoted to alternative parameter spaces in which reflectance models can be sampled, either deteministically or stochastically. The last section discusses an important implementation issue, more specifically the problem of verifying the implementation of a reflectance model.},
@@ -203,6 +254,18 @@ keywords = {cook-torrance model,global illumination,microfacet btdf,monte carlo 
 title = {{Microfacet models for refraction through rough surfaces}},
 url = {http://dl.acm.org/citation.cfm?id=2383874},
 year = {2007}
+}
+@misc{Whitted1979,
+abstract = {To accurately render a two-dimensional image of a three-dimensional scene, global illumination information that affects the intensity of each pixel of the image must be known at the time the intensity is calculated. In a simplified form, this information is stored in a tree of "rays" extending from the viewer to the first surface encountered and from there to other surfaces and to the light sources. A visible surface algorithm creates this tree for each pixel of the display and passes it to the shader. The shader then traverses the tree to determine the intensity of the light received by the viewer. Consideration of all of these factors allows the shader to accurately simulate true reflection, shadows, and refraction, as well as the effects simulated by conventional shaders. Anti-aliasing is included as an integral part of the visibility calculations. Surfaces displayed include curved as well as polygonal surfaces.},
+author = {Whitted, Turner},
+booktitle = {ACM SIGGRAPH Computer Graphics},
+doi = {10.1145/965103.807419},
+isbn = {0897910044},
+issn = {00978930},
+pages = {14},
+title = {{An improved illumination model for shaded display}},
+volume = {13},
+year = {1979}
 }
 @article{Wynn2000,
 author = {Wynn, Chris},

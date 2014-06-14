@@ -8,9 +8,13 @@ En el entorno de la imagen generada por computador siempre ha sido un reto trata
 
 Estos algoritmos, por lo general, suelen tener una complejidad computacional muy elevada y el tiempo de cómputo necesario para obtener un resultado satisfactorio en escenas complejas era un factor limitador en su aplicación práctica. Por ello las aplicaciones que hacen uso de gráficos 3D en tiempo real típicamente se centran en la iluminación local o directa de los objetos de la escena y simulan la iluminación indirecta mediante técnicas que aun sin tener un fundamento físico ofrecen una mayor credibilidad para el ojo humano. Estas técnicas suelen ser algoritmos de postprocesado que se aplican en espacio de pantalla, por ejemplo \emph{ambient occlusion} o \emph{directional occlusion}. 
 
-Sin embargo en los últimos años se han realizado grandes avances en las arquitecturas de las unidades de procesamiento de gráficos (GPUs), en especial la gran capacidad de cómputo en paralelo debido al elevado número de microprocesadores que forman estos dispositivos. Con tal de aprovechar estos avances en el hardware, los fabricantes de GPU han desarrollado librerías de computo generico (OpenCL, CUDA) que ofrecen gran libertad al programador para implementar sus propios algoritmos.
+\medskip
 
-Estas mejoras han permitido realizar implementaciones de algoritmos de iluminación global en las GPUs que son mucho más rápidos que las implementaciones típicas en la CPU permitiendo reducir el tiempo de cómputo de varias horas o días a minutos e incluso a ratios interactivos dependiendo de la GPU y algoritmos utilizados.
+Sin embargo en los últimos años se han realizado grandes avances en las arquitecturas de las unidades de procesamiento de gráficos (GPUs), en especial la gran capacidad de cómputo en paralelo debido al elevado número de microprocesadores que forman estos dispositivos. Con tal de aprovechar estos avances en el hardware los fabricantes de GPU han desarrollado librerías de computo genérico (OpenCL, CUDA), que ofrecen gran libertad al programador para implementar sus propios algoritmos.
+
+\medskip
+
+Estas mejoras han permitido realizar implementaciones de algoritmos de iluminación global en las GPUs que son mucho más rápidos que las implementaciones típicas en la CPU, permitiendo reducir el tiempo de cómputo de varias horas o días a minutos e incluso a tiempos interactivos dependiendo de la GPU y algoritmos utilizados.
 
 \clearpage
 
@@ -19,11 +23,15 @@ Estas mejoras han permitido realizar implementaciones de algoritmos de iluminaci
 Se conoce como algoritmos de iluminación global aquellos que tratan de simular distintos aspectos del comportamiento de la luz en su interacción con los objetos de una escena tridimensional. Algunos de ellos están pensados y optimizados para fenómenos concretos mientras que otros tratan de recrear fielmente todos los aspectos del transporte de luz.
 
 \medskip
-En esta sección revisaremos por encima algunos de los algoritmos clásicos. Téngase en cuenta que no es el objetivo de este trabajo dar una explicación detallada de cada uno de estos algoritmos. Si el lector desea mas información sobre alguno de ellos se han citado las fuentes originales a las que puede remitirse.
+En esta sección revisaremos por encima algunos de los algoritmos clásicos. Téngase en cuenta que no es el objetivo de este trabajo hacer un análisis exhaustivo de todos los algoritmos ni dar una explicación detallada de cada uno de ellos. Si el lector desea mas información sobre alguno de ellos se han citado las fuentes originales a las que puede remitirse.
 
 \subsection{Ray tracing}
 
-Aunque no se trata de un algoritmo de iluminación global propiamente dicho, el algoritmo de ray tracing original, desarrollado primeramente por Appel (year) y posteriormente ampliado por Whitted (year), es relevante por la influencia que ha tenido en el campo de los gráficos generados por computador y por que ha servido de base para métodos de iluminación global desarrollados posteriormente. 
+Aunque no se trata de un algoritmo de iluminación global propiamente dicho, el algoritmo de ray tracing original, desarrollado primeramente por Appel (1968)\nocite{Appel1968} y posteriormente ampliado en \cite{Whitted1979}, es relevante por la influencia que ha tenido en el campo de los gráficos generados por computador y por que ha servido de base para métodos de iluminación global desarrollados posteriormente. 
+
+\medskip
+
+En este algoritmo se lanzan rayos desde la cámara a través de los pixels de la pantalla y se comprueba si interseccionan con los objetos de la escena. En la versión de Whitted además se lanzan rayos recursivamente si el objeto es reflectante o refractante y hacia las luces, para comprobar si al objeto le llega luz directamente.
 
  
 \subsection{Radiosity}
@@ -31,10 +39,12 @@ Aunque no se trata de un algoritmo de iluminación global propiamente dicho, el 
 Radiosity fue el primero de los algoritmos de iluminación global que se desarrollaron. Inicialmente el algoritmo fue desarrollado en los años 1950 para aplicarlo al problema de la transferencia de calor. En 1984 fue modificado y adaptado por \nocite{Goral1984} Cindy M. Goral, Kenneth E. Torrance, Donald P. Greenberg y Bennett Battaile, investigadores de la universidad de Cornell para su aplicación en la generación de imagen sintética.
 
 \medskip
-Este algoritmo trata de resolver el problema de la iluminación indirecta entre superficies puramente difusas o Lambertianas sin tomar en cuenta la reflectancia especular.
+
+Este algoritmo trata de resolver el problema de la iluminación indirecta entre superficies puramente difusas sin tomar en cuenta la reflectancia especular.
 
 \medskip
-El funcionamiento del algortimo, en lineas generales, se basa en dividir la escena en pequeñas unidades de area, llamadas parches, que deberian funcionar como diferenciales de area. Luego a traves de una serie de iteraciones se intenta balancear el flujo de luz emitido, reflejado y absorbido entre todos estos parches.
+
+El funcionamiento del algoritmo, en lineas generales, se basa en dividir la escena en pequeñas unidades de área, llamadas parches, que deberían funcionar como diferenciales de área. Luego a través de una serie de iteraciones se intenta balancear el flujo de luz emitido, reflejado y absorbido entre todos estos parches.
 
 \clearpage
 
@@ -43,31 +53,33 @@ El funcionamiento del algortimo, en lineas generales, se basa en dividir la esce
 El algoritmo de path tracing \cite{Kajiya1986} sea posiblemente el primer algoritmo capaz de solucionar completamente la ecuación de renderizado.
 
 \medskip
+
 Este algoritmo empieza como el ray tracing clásico, lanzado rayos desde la cámara hacia la escena, pero cuando un rayo intersecciona con un objeto se lanza un rayo en una dirección aleatoria para tener una estimación de cuanta luz indirecta llega a ese punto. Este rayo aleatorio a su vez es evaluado recursivamente siguiendo el mismo algoritmo. 
 
 \medskip 
+
 Evidentemente este proceso de trazar un rayo desde la cámara y hacerlo rebotar por la escena para obtener un estimación de la luz es muy impreciso, por lo que es necesario repetir el proceso varias veces y hacer la media entre los resultados obtenidos para obtener  una solución satisfactoria. 
 
 \subsection{Bidirectional path tracing}
 
-El algoritmo de Bidirectional path tracing \cite{Lafortune1993} fue desarrollado como una extensión al algoritmo de path tracing de Kajiya. En esta modalidad los rayos primarios no solo se lanzan desde la camara sino también desde las fuentes de luz. Estos caminos de luz, se calculan del mismo modo que los de la camara. Se guardan los puntos de intersección de los caminos de la camara y los de la luz y en una ultima fase se unen estos dos grupos de puntos para obtener la evaluación final del camino.
+El algoritmo de Bidirectional path tracing \cite{Lafortune1993} fue desarrollado como una extensión al algoritmo de path tracing de Kajiya. En esta modalidad los rayos primarios no solo se lanzan desde la cámara sino también desde las fuentes de luz. Estos caminos de luz, se calculan del mismo modo que los de la cámara. Se guardan los puntos de intersección de los caminos de la cámara y los de la luz y en una ultima fase se unen estos dos grupos de puntos para obtener la evaluación final del camino.
 
 \medskip
-La principal mejora de este algoritmo respecto a su antecesor es que es capaz de funcionar mejor y converger mas rapido hacia una solucion correcta en escenas complejas en las que las fuentes de luz no son facilmente visibles desde la mayoria de puntos de la escena.
+La principal mejora de este algoritmo respecto a su antecesor es que es capaz de funcionar mejor y converger mas rápido hacia una solución correcta en escenas complejas en las que las fuentes de luz no son facilmente visibles desde la mayoria de puntos de la escena.
 
 \subsection{Metropolis light transport}
 
 Siguiendo en la linea de los dos algoritmos anteriores otra notable mejora llego con el llamado Metropolis light transport \cite{Veach1997}. Este algoritmo parte de la base del path tracing bidireccional pero en vez de confiar en crear muchos paths hasta converger a una solución aceptable utiliza un método conocido como algoritmo de Metropolis-Hastings para generar varias mutaciones del mismo path. 
 
 \medskip
-Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales que normalmente serian muy costosas de renderizar con los algoritmos que hemos comentado anteriormenteme. Por ejemplo causiticas, interreflecciones especulares-difusas, etc.
+Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales que normalmente serian muy costosas de renderizar con los algoritmos que hemos comentado anteriormente. Por ejemplo causticas, intereflexiones especulares-difusas, etc.
 
 \clearpage
 
 \subsection{Photon mapping}
 
 Todos los algoritmos que estamos viendo tratan la luz como partículas y no como ondas, pero este algoritmo lo hace de un modo aun mas explicito.
-El algoritmo de Photon mapping [REFERENCIA JENSEN] empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y segun las propiedades (BRDF) del material si el foton sera absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
+El algoritmo de Photon mapping \cite{Jensen1996} empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y segun las propiedades (BRDF) del material si el fotón sera absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
 
 \medskip
 La siguente fase, llamada final gathering, realiza un ray tracing de la escena y en cada intersección consulta el mapa de fotones para ver la cantidad de luz que llega a ese punto.
@@ -78,7 +90,7 @@ Este algoritmo sobresale entre todos los demás cuando se trata de renderizar ca
 
 \subsection{Instant radiosity}
 
-Este algoritmo, desarrollado por Keller en 1997, combina las ideas de los algoritmos de radiosity y photon mapping. Igual que el radiosity original, este algoritmo, en principio, solo funciona para superficies puramente difusas.
+Este algoritmo, desarrollado por Keller en 1997 \nocite{Keller1997}, combina las ideas de los algoritmos de radiosity y photon mapping. Igual que el radiosity original, este algoritmo, en principio, solo funciona para superficies puramente difusas.
 
 \medskip
 La idea general consiste en lanzar fotones desde las fuentes de luz (como en foton mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX.
@@ -87,7 +99,6 @@ La idea general consiste en lanzar fotones desde las fuentes de luz (como en fot
 
 Además del algoritmo de instant radiosity básico existen modificaciones del mismo que combinan las ideas de los algoritmos de path tracing con el de instant radisioty. En este conjunto de algoritmos encontramos el instant radiosity bidireccional y el metropolis instant radiosity.  
 
-\subsection{Irrandiance caching}
 
 \clearpage
 
@@ -134,7 +145,7 @@ Para ello, un primer objetivo necesario era estudiar los distintos algoritmos y 
 
 \medskip
 
-Una vez decidido el algoritmo, otro objetivo parcial necesario para alcanzar el objetivo primario es realizar un estudio teórico detallado del algoritmo en cuestión y de las tecnicas y conceptos relacionados con el mismo con tal de tener una comprensión del mismo lo bastante profunda como para realizar una implementación seria.
+Una vez decidido el algoritmo, otro objetivo parcial necesario para alcanzar el objetivo primario es realizar un estudio teórico detallado del algoritmo en cuestión y de las técnicas y conceptos relacionados con el mismo con tal de tener una comprensión del mismo lo bastante profunda como para realizar una implementación seria.
 
 \medskip
 

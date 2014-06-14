@@ -1,17 +1,17 @@
 \chapter{Fundamentos teóricos}
 
 \section{Unidades Radiométricas}
-Se conoce como radiometría al estudio de las radiaciones electromagneticas. Ya que la luz visible es una onda electromagnetica los algoritmos de renderizado que buscan el realismo se fundamentan sobre conceptos radiométricos. Por ello en esta sección haremos una pequeña introducción sobre algunos conceptos básicos que nos permitiran entender mejor los algoritmos de iluminación global.  
+Se conoce como radiometría al estudio de las radiaciones electromagnéticas. Ya que la luz visible es una onda electromagnética los algoritmos de renderizado que buscan el realismo se fundamentan sobre conceptos radiométricos. Por ello en esta sección haremos una pequeña introducción sobre algunos conceptos básicos que nos permitirán entender mejor los algoritmos de iluminación global.  
 \subsection{Flujo}
 
-El flujo radiometrico mide la cantidad de energia radiante por unidad de tiempo. Sus unidades son Watts o Joules/segundo.
+El flujo radiométrico mide la cantidad de energía radiante por unidad de tiempo. Sus unidades son Watts o Joules/segundo.
 
 \begin{equation}
 \Phi = \frac{dQ(t)}{dt}
 \end{equation}
 
 \subsection{Irradiancia}
-La irradiancia representa el flujo incidente en una superficie y se mide como el flujo radiante por unidad de area y sus unidades son de $W/m^2$ 
+La irradiancia representa el flujo incidente en una superficie y se mide como el flujo radiante por unidad de área y sus unidades son de $W/m^2$ 
 
 \begin{equation}
 E = \frac{d\Phi}{dA}
@@ -29,7 +29,7 @@ Podemos entender el concepto de angulo solido como la extension del angulo a las
 \caption{Definición de angulo solido \cite{Haade}}
 \end{figure}
 
-El angulo solido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas stereorradianes $[sr]$.
+El angulo solido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas estereorradianes $[sr]$.
 \begin{equation}
 \Omega = \frac{A}{r^2}
 \end{equation}
@@ -47,7 +47,7 @@ Informalmente resulta sencillo entender el angulo solido si pensamos en \emph{cu
 
 \subsection{Radiancia}
 
-La radiancia, también llamada intensidad por algunos autores \cite{Kajiya1986, Immel1986}, es probablemente la unidad radiometrica mas importante en lo que concierne al presente trabajo y a muchos de los algoritmos de iluminación global ya que su valor es invariante a lo largo de la longitud de un rayo.
+La radiancia, también llamada intensidad por algunos autores, es probablemente la unidad radiométrica mas importante en lo que concierne al presente trabajo y a muchos de los algoritmos de iluminación global ya que su valor es invariante a lo largo de la longitud de un rayo.
 
 Esta unidad mide la irradiancia por unidad de angulo solido.
 
@@ -119,18 +119,10 @@ En la forma usada por Lafortune y Willems la función aparece como:
 f(x, l, v) = \frac{k_d}{\pi} + k_s \frac{n + 2}{2 \pi} \cos^n\alpha
 \end{equation}
 
-donde $\alpha$ es el angulo entre la dirección de reflexión especular perfecta y $v$.
+donde $\alpha$ es el angulo entre la dirección de reflexión especular perfecta y $l$.
 En esta forma la función esta normalizada para conservar la energía pero además para que esto sea cierto se debe cumplir $k_d + k_s \leq 1$.
 
- 
 
-\subsection{Modelo de Blinn-Phong}
-
-\subsection{Modelo de Cook-Torrance}
-
-\subsection{Modelo de Ward}
-
-\subsection{Modelo de Beckmann}
 
 \clearpage
 
@@ -289,10 +281,11 @@ L(x \to v) = \frac{L(x \gets l)k_d(n \cdot l)}{q_1 pdf_{diff}(l)}
 si evaluamos el factor especular
 
 \begin{equation}
-L(x \to v) = \frac{L(x \gets l)k_s(n \cdot l)(R \cdot v)^n}{q_2 pdf_{spec}(l)}
+L(x \to v) = \frac{L(x \gets l)k_s(n \cdot l)(R \cdot l)^n}{q_2 pdf_{spec}(l)}
 \end{equation}
+siendo $R$ el vector $v$ reflejado respecto a la normal.
 
-y si el rayo es absorbido la contribución es 0.
+si el rayo es absorbido la contribución es $0$.
 
 
 
@@ -300,13 +293,13 @@ y si el rayo es absorbido la contribución es 0.
 \clearpage
 
 \subsection{Muestreo del angulo solido subtendido}
+\label{sample_solid}
 
-Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear un fuente de luz sera necesario integrar el angulo solido subtendido por dicha fuente de luz. A priori, no sabemos si la fuente de luz estara ocluida pero si que podemos saber que angulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega, por lo tanto la idea sera lanzar solo rayos dentro de este angulo solido para que vayan dirigidos hacia la fuente de luz.
+Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear un fuente de luz sera necesario integrar el angulo solido subtendido por dicha fuente de luz. A priori, no sabemos si la fuente de luz estará ocluida pero si que podemos saber que angulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega, por lo tanto la idea sera lanzar solo rayos dentro de este angulo solido para que vayan dirigidos hacia la fuente de luz.
 
 \medskip
 
-Para proceder de este modo sera necesario calcular el angulo solido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos usado fuentes de luz en forma de cúpula celestial, esféricas, paralelogramos y triángulos.
-
+Para proceder de este modo sera necesario calcular el angulo solido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos utilizado luces esféricas pero es posible aplicar un método similar para luces poligonales.
 
 \subsubsection{Esfera}
 

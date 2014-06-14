@@ -110,9 +110,9 @@ RT_PROGRAM void m_pinhole_camera()
   cumulated_buffer[buff_idx] += make_float3( prd.result.z, prd.result.y, prd.result.x );
 	
   float3 render_color = cumulated_buffer[buff_idx] / (currentSample + 1u);
-  output_buffer[buff_idx] = make_float3 (	__saturatef(render_color.z),
-											__saturatef(render_color.y ),
-											__saturatef(render_color.x )
+  output_buffer[buff_idx] = make_float3 (	__saturatef( powf( render_color.z, 1.0f/2.0f) ),
+											__saturatef( powf( render_color.y, 1.0f/2.0f) ),
+											__saturatef( powf( render_color.x, 1.0f/2.0f) )
 										);
   /*
   output_buffer[launch_index] = make_float3 (	__saturatef(prd.result.z),

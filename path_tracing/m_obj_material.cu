@@ -228,14 +228,10 @@ RT_PROGRAM void diffuse()
 			float sin_theta = sqrtf(sin2theta);
 			float sin_phi = sinf(2 * PI * r2);
 			float cos_phi = cosf(2 * PI * r2);
-			//float3 dir = make_float3( sqrtf(sin2theta), cos_theta, 2 * PI * r2);
 			float3 w = normalize(light_dir);
 			float3 u, v;
 			createONB(w, u, v);
-			float3 dir = make_float3(u.x * cos_phi * sin_theta + v.x * sin_phi * sin_theta + w.x * cos_theta,
-									 u.y * cos_phi * sin_theta + v.y * sin_phi * sin_theta + w.y * cos_theta,
-									 u.z * cos_phi * sin_theta + v.z * sin_phi * sin_theta + w.z * cos_theta
-									);
+			float3 dir = normalize( u * cos_phi * sin_theta + v * sin_phi * sin_theta + w * cos_theta );
 
 			if(dot(dir, ffnormal) < 0) continue;
 			PerRayData_shadow shadow_prd;
