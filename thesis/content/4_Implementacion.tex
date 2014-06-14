@@ -180,14 +180,25 @@ En la variable d normalizamos esas coordenadas para obtener las coordenadas de p
 
 \clearpage
 
-\section{Muestreo de la hemiesfera}
+\section{Muestreo de la BRDF}
 
+Para el muestreo de la BRDF usamos el modelo propuesto en \cite{Lafortune1994} que hemos explicado en la sección \ref{muestreo_brdf}.
+\medskip
+
+En primer lugar decidimos aleatoriamente si muestrear la parte difusa o la parte especular de la BRDF. Para ello proponemos usar como probabilidades las medias de los valores RGB de las componentes difusa y especular: $p_{diff} =\frac{1}{3}( k_{dR} + k_{dG} + k_{dB})$ y $p_{spec} =\frac{1}{3}( k_{sR} + k_{sG} + k_{sB})$ 
+
+\medskip
+
+Generamos un un numero aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestreamos la parte especular, si $p_{spec} < r \leq p_{spec} + p_{diff}$ la parte difusa, en caso contrario el rayo es absorbido y terminamos la recursión del mismo.
+
+\medskip
+
+Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnica de reducción de la variancia usado en integraciones por monte carlo. Para compensar esta terminación anticipada y la separación entre rayos difusos y especular dividiremos el resultado entre la probabilidad de que se lance ese rayo. Ya que se muestrea con mas probabilidad el evento mas probable esto servirá para dar mas peso a aquellas muestras menos probables.
+
+\subsection{Muestreo de la parte difusa de la BRDF}
 En el programa de closest hit, muestreamos la hemiesfiera centrada en el punto de intersección para tener una estimación de la luz incidente.
 
 \begin{lstlisting}
-
-bool hit_light = false;
-if(prd_radiance.depth < max_depth){
 	unsigned int seed = prd_radiance.seed;
 	float r1 = rnd(seed);
 	float r2 = rnd(seed);
@@ -206,16 +217,14 @@ if(prd_radiance.depth < max_depth){
 	optix::Ray diffuse_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
 	rtTrace(top_object, diffuse_refl_ray, diffuse_refl_prd);
 	brdfLight = diffuse_refl_prd.result;
-	color += brdfLight * Kd;
-	hit_light = diffuse_refl_prd.is_light;
-}
+	color += brdfLight * Kd / prob_diff;
 \end{lstlisting}
 
 Basicamente lo que hace es, en el caso de que no hayamos llegado a la profundidad de recursión máxima, muestrear un punto en la hemiesfiera con densidad de coseno, generar una base ortonormal en función de la normal de la superficie y transformar el punto de la hemiesfera con esa base. Se traza un rayo recursivamente en la dirección obtenida y el color devuelto por ese rayo se multiplica por el color difuso de la superficie.
 
 \medskip
 
-Hay que hacer notar que en la instrucción \emph{color += brdfLight * Kd;} no estamos multiplicando por el típico factor coseno de la normal y la luz. No lo hacemos porque al tomar la muestra con densidad coseno y dividir entre la densidad de probabilidad de esa muestra los factores coseno se anulan.
+Hay que hacer notar que en la instrucción \emph{color += brdfLight * Kd / prob\_diff;} no estamos multiplicando por el típico factor coseno de la normal y la luz. No lo hacemos porque al tomar la muestra con densidad coseno y dividir entre la densidad de probabilidad de esa muestra los factores coseno se anulan.
 Siguiendo con ese razonamiento y teniendo en cuenta que la densidad coseno es $\frac{cos(l,n)}{\pi}$ deberíamos multiplicar el resultado por $\pi$ para ser coherentes con la teoría pero lo hemos quitado del cálculo porque hemos comprobado empíricamente que el resultado final es mas satisfactorio sin ese factor, que en caso de incluirlo en el cálculo generaba imágenes excesivamente iluminadas y quemadas.
 
 \medskip
@@ -226,9 +235,47 @@ En las primeras fases de la implementación realizamos algunos renderizados con 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=2in]{Solid_Angle.png}
-\caption{Definición de angulo solido \cite{Haade}}
+\includegraphics[width=5in]{dome1.png}
+\caption{Muestreo de la brdf difusa}
 \end{figure}
+
+\clearpage
+
+\subsection{Muestreo de la parte especular de la BRDF}
+
+En el caso de la parte especular usamos como densidad de probabilidad una potencia de coseno de forma que el exponente sea mayor cuanto mas reflectante sea el material. Ese vector es posteriormente transformado con una base ortonormal orientada hacia la dirección de reflexion perfecta.
+
+\begin{lstlisting}
+	float3 eye = -ray.direction;
+	float3 perfect_specular = normalize(2.0 * ffnormal * dot(ffnormal, eye) - eye);
+	createONB(perfect_specular, u, v);
+	p = sample_specular2(phong_exp, r1, r2);
+	float3 rd = normalize(u * p.x + v * p.y + perfect_specular * p.z);
+	if(dot(rd, ffnormal) > 0.0f){
+		PerRayData_radiance specular_refl_prd;
+		specular_refl_prd.seed = seed;
+		specular_refl_prd.depth = prd_radiance.depth + 1;
+		specular_refl_prd.contribution *= Ks;
+		specular_refl_prd.is_light = false;
+		optix::Ray specular_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
+		rtTrace(top_object, specular_refl_ray, specular_refl_prd);
+		brdfLight = specular_refl_prd.result;
+				
+		color += ( brdfLight * Ks * (phong_exp + 2) * dot(rd, ffnormal) ) / ( (phong_exp + 1) * prob_spec );
+	}
+
+\end{lstlisting}
+
+
+\section{Muestreo de luces}
+
+Una mejora importante que hemos implementado ha sido el muestreo directo de fuentes de luz. Muestrear las luces directamente provoca que el renderizado converja mas rápido al lanzar rayos hacia zonas de la escena que es mas probable que aporten luz al computo final.
+
+\begin{lstlisting}
+
+
+
+\end{lstlisting}
 
 
 
