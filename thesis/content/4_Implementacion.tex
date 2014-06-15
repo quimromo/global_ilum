@@ -147,6 +147,8 @@ TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
 }
 \end{lstlisting}
 
+\clearpage
+
 \subsection{Device}
 
 En el device tenemos un programa encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parametros necesarios para lanzar el rayo correcto.
@@ -166,6 +168,7 @@ d.x *= aspect_ratio;
 float3 ray_origin = eye;
 float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
 \end{lstlisting}
+
 El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él indice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel estamos pintando, en coordenadas absolutas de la imagen entera.
 
 \medskip
