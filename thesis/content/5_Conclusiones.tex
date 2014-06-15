@@ -1,10 +1,34 @@
 \chapter{Conclusiones y resultados}
 
+\section{Algunos resultados}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=5in]{sibenik_specular.png}
+\caption{La textura del suelo es un mapa especular}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=5in]{crytek_sponza1.png}
+\caption{Tres fuentes de luz poco visibles iluminan toda la escena}
+\end{figure}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=5in]{single_light_sponza.png}
+\caption{Iluminación por una unica fuente de luz}
+\end{figure}
+
+\clearpage
 
 \section{Valoración de los resultados obtenidos}
 
 
 El campo de estudio en el que se sitúa el presente trabajo es muy amplio y ha sido muy estudiado por un gran numero de investigadores. A medida que profundizábamos en la materia de estudio iban surgiendo cada ves mas detalles, mejoras y variaciones en la teoría que incrementaban el abasto del proyecto y generaban nuevas dudas. Por ello hemos llegado a un punto en el que, por el abasto de un TFG, hemos tenido que empezar a descartar cosas que al autor le hubiese gustado investigar en mas profundidad. Aun así, valoramos positivamente los resultados obtenidos pues se ha alcanzado el objetivo principal de este trabajo que era implementar un algoritmo de renderizado realista. Además la implementación en la GPU ha demostrado ser bastante rápida, mas aun si consideramos que la GPU usada en el desarrollo de este trabajo y en las pruebas realizadas es de una gama baja entre las presentes en el mercado.
+
+\clearpage
 
 \section{Posibles mejoras}
 
@@ -19,7 +43,20 @@ Una buena explicación de este uso combinado de algoritmos se puede encontrar en
 
 Por ultimo y aunque no era el objetivo de este proyecto, una mejora interesante seria implementar una interfaz de usuario que permitiese configurar la escena de forma fácil y cómoda. Por ejemplo una interfaz con Qt con una vista OpenGL, que permita previsualizar la escena, cargar modelos tridimensionales y colocar las luces y la cámara facilitaría mucho el hecho de configurar escenas y crear nuevos renderizados.
 
+\clearpage
 
 \section{Perspectivas de futuro}
 
-Teniendo en cuenta los resultados obtenido, que la GPU utilizada no es de las del mejores del mercado y que nuestra implementación es muy optimizable. Considerando además la velocidad a la que avanza la tecnología de las tarjetas gráficas y que ya existen aproximaciones a soluciones de iluminación global con tiempos de renderizado interactivos, creemos que en pocos años sera habitual disponer de aplicaciones que hagan uso de este tipo de algoritmos en tiempo real. 
+Durante el desarrollo de este proyecto hemos podido comprobar que las ganancias de velocidad al ejecutar el algoritmo de path tracing en la GPU, frente a hacerlo en la CPU, son muy notorias. Con nuestra implementación es posible renderizar escenas de varios millones de polígonos, con cientos de muestras por pixel en unos cuantos minutos. Realizar el mismo tipo de renderizado en una CPU actual podría tardar varios días.
+
+\medskip
+
+Además, considerando que los experimentos se han realizado con una tarjeta gráfica de ordenador portátil y que la implementación es muy optimizable, creemos que en pocos años sera habitual disponer de software capaz de renderizar escenas con iluminación global en tiempo real.
+
+\nocite{Ashikhmin2000}
+\nocite{Cook1984}
+\nocite{Dutre2003}
+\nocite{Torrance1967}
+\nocite{Torrance1967}
+\nocite{Veach1995}
+\nocite{Walter2007}
