@@ -20,10 +20,10 @@ Estas mejoras han permitido realizar implementaciones de algoritmos de iluminaci
 
 \section{Algoritmos de iluminación global}
 
-Se conoce como algoritmos de iluminación global aquellos que tratan de simular distintos aspectos del comportamiento de la luz en su interacción con los objetos de una escena tridimensional. Algunos de ellos están pensados y optimizados para fenómenos concretos mientras que otros tratan de recrear fielmente todos los aspectos del transporte de luz.
+Se conoce como algoritmos de iluminación global aquellos que tratan de simular distintos aspectos del comportamiento de la luz en su interacción con los objetos de una escena tridimensional. Algunos de ellos están pensados y optimizados para fenómenos concretos, mientras que otros tratan de recrear fielmente todos los aspectos del transporte de luz.
 
 \medskip
-En esta sección revisaremos por encima algunos de los algoritmos clásicos. Téngase en cuenta que no es el objetivo de este trabajo hacer un análisis exhaustivo de todos los algoritmos ni dar una explicación detallada de cada uno de ellos. Si el lector desea mas información sobre alguno de ellos se han citado las fuentes originales a las que puede remitirse.
+En esta sección revisaremos por encima algunos de los algoritmos clásicos. Téngase en cuenta que no es el objetivo de este trabajo hacer un análisis exhaustivo de todos los algoritmos ni dar una explicación detallada de cada uno de ellos. Si el lector desea mas información sobre alguno de ellos, se han citado las fuentes originales a las que puede remitirse.
 
 \subsection{Ray tracing}
 
@@ -54,25 +54,25 @@ El algoritmo de path tracing \cite{Kajiya1986} sea posiblemente el primer algori
 
 \medskip
 
-Este algoritmo empieza como el ray tracing clásico, lanzado rayos desde la cámara hacia la escena, pero cuando un rayo intersecciona con un objeto se lanza un rayo en una dirección aleatoria para tener una estimación de cuanta luz indirecta llega a ese punto. Este rayo aleatorio a su vez es evaluado recursivamente siguiendo el mismo algoritmo. 
+Este algoritmo empieza como el ray tracing clásico, lanzando rayos desde la cámara hacia la escena, pero cuando un rayo intersecciona con un objeto se lanza un rayo en una dirección aleatoria para tener una estimación de cuanta luz indirecta llega a ese punto. Este rayo aleatorio, a su vez es evaluado recursivamente siguiendo el mismo procedimiento. 
 
 \medskip 
 
-Evidentemente este proceso de trazar un rayo desde la cámara y hacerlo rebotar por la escena para obtener un estimación de la luz es muy impreciso, por lo que es necesario repetir el proceso varias veces y hacer la media entre los resultados obtenidos para obtener  una solución satisfactoria. 
+Evidentemente este proceso de trazar un rayo desde la cámara y hacerlo rebotar por la escena para obtener un estimación de la luz es muy impreciso, por lo que es necesario repetir el proceso varias veces, y hacer la media entre los resultados obtenidos para obtener una solución satisfactoria. 
 
 \subsection{Bidirectional path tracing}
 
-El algoritmo de Bidirectional path tracing \cite{Lafortune1993} fue desarrollado como una extensión al algoritmo de path tracing de Kajiya. En esta modalidad los rayos primarios no solo se lanzan desde la cámara sino también desde las fuentes de luz. Estos caminos de luz, se calculan del mismo modo que los de la cámara. Se guardan los puntos de intersección de los caminos de la cámara y los de la luz y en una ultima fase se unen estos dos grupos de puntos para obtener la evaluación final del camino.
+El algoritmo de Bidirectional path tracing \cite{Lafortune1993} fue desarrollado como una extensión al algoritmo de path tracing de Kajiya. En esta modalidad los rayos primarios no solo se lanzan desde la cámara, sino también desde las fuentes de luz. Estos caminos de luz, se calculan del mismo modo que los de la cámara. Se guardan los puntos de intersección de los caminos de la cámara y los de la luz y en una ultima fase se unen estos dos grupos de puntos para obtener la evaluación final del camino.
 
 \medskip
-La principal mejora de este algoritmo respecto a su antecesor es que es capaz de funcionar mejor y converger mas rápido hacia una solución correcta en escenas complejas en las que las fuentes de luz no son facilmente visibles desde la mayoría de puntos de la escena.
+La principal mejora de este algoritmo respecto a su antecesor, es que es capaz de funcionar mejor y converger mas rápido hacia una solución correcta en escenas complejas, en las que las fuentes de luz no son fácilmente visibles desde la mayoría de puntos de la escena.
 
 \subsection{Metropolis light transport}
 
-Siguiendo en la linea de los dos algoritmos anteriores otra notable mejora llego con el llamado Metropolis light transport \cite{Veach1997}. Este algoritmo parte de la base del path tracing bidireccional pero en vez de confiar en crear muchos paths hasta converger a una solución aceptable utiliza un método conocido como algoritmo de Metropolis-Hastings para generar varias mutaciones del mismo path. 
+Siguiendo en la linea de los dos algoritmos anteriores, otra notable mejora llego con el llamado Metropolis light transport \cite{Veach1997}. Este algoritmo parte de la base del path tracing bidireccional, pero en vez de confiar en crear muchos paths hasta converger a una solución aceptable, utiliza un método conocido como algoritmo de Metropolis-Hastings para generar varias mutaciones del mismo path. 
 
 \medskip
-Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales que normalmente serian muy costosas de renderizar con los algoritmos que hemos comentado anteriormente. Por ejemplo causticas, intereflexiones especulares-difusas, etc.
+Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales, que normalmente serian muy costosas de renderizar con los algoritmos que hemos comentado anteriormente. Por ejemplo cáusticas, intereflexiones especulares-difusas, etc.
 
 \clearpage
 
@@ -85,7 +85,7 @@ El algoritmo de Photon mapping \cite{Jensen1996} empieza lanzando rayos (fotones
 La siguiente fase, llamada final gathering, realiza un ray tracing de la escena y en cada intersección consulta el mapa de fotones para ver la cantidad de luz que llega a ese punto.
 
 \medskip
-Este algoritmo sobresale entre todos los demás cuando se trata de renderizar causticas. Pero en cambio puede producir errores cuando se renderizan superficies difusas si el numero de fotones no es muy grande.
+Este algoritmo sobresale entre todos los demás cuando se trata de renderizar cáusticas, pero en cambio, puede producir errores cuando se renderizan superficies difusas si el numero de fotones no es muy grande.
 
 
 \subsection{Instant radiosity}
@@ -93,7 +93,7 @@ Este algoritmo sobresale entre todos los demás cuando se trata de renderizar ca
 Este algoritmo, desarrollado por Keller en 1997 \nocite{Keller1997}, combina las ideas de los algoritmos de radiosity y photon mapping. Igual que el radiosity original, este algoritmo, en principio, solo funciona para superficies puramente difusas.
 
 \medskip
-La idea general consiste en lanzar fotones desde las fuentes de luz (como en photon mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX.
+La idea general consiste en lanzar fotones desde las fuentes de luz (como en photon mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware, como OpenGL o DirectX, o con ray tracing.
 
 \medskip
 
@@ -108,14 +108,14 @@ El propósito de esta sección es explicar las principales tecnologías utilizad
 
 \subsection{Arquitectura de las GPU modernas}
 
-Las arquitecturas de GPU modernas siguen una paradigma conocido como SIMD (del inglés, Single Instruction Multiple Data) que consiste en la capacidad de un procesador de ejecutar la misma instrucción en paralelo sobre datos distintos. Es decir que que se ejecuta el mismo proceso en varias unidades de computo pero los datos que trata cada unidad pueden ser distintos.
+Las arquitecturas de GPU modernas siguen una paradigma conocido como SIMD (del inglés, Single Instruction Multiple Data), que consiste en la capacidad de un procesador de ejecutar la misma instrucción en paralelo sobre datos distintos. Es decir, que se ejecuta el mismo proceso en varias unidades de computo, pero los datos que trata cada unidad pueden ser distintos.
 
 \subsection{Shaders}
 
-Los fabricantes de GPUs empezaron a explotar esta capacidad de computo en paralelo ofreciendo a los programadores de gráficos la posibilidad de programar ciertos puntos del proceso de renderizado efectuado por las GPU con los llamados shaders. Los shaders son pequeños programas que se ejecutan en la GPU y sirven para programar funcionalidades, tradicionalmente existían dos tipos de shaders: los vertex shaders, que se ejecutaban para cada vértice de cada primitiva a pintar y los pixel o fragment shaders que se ejecutaban para cada pixel rasterizado.
+Los fabricantes de GPUs empezaron a explotar esta capacidad de computo en paralelo, ofreciendo a los programadores de gráficos la posibilidad de programar ciertos puntos del proceso de renderizado efectuado por las GPU, con los llamados shaders. Los shaders son pequeños programas que se ejecutan en la GPU y sirven para programar funcionalidades. Tradicionalmente existían dos tipos de shaders: los vertex shaders, que se ejecutaban para cada vértice de cada primitiva a pintar, y los pixel o fragment shaders que se ejecutaban para cada pixel rasterizado.
 
 \medskip
-Según el paradigma SIMD, solo puede ejecutarse único shader en cada GPU pero los datos pueden ser distintos: en el caso de los vertex shaders, por ejemplo, cada unidad de procesamiento tendrá acceso a las coordenadas geométricas de un vértice, las coordenadas de textura de ese vértice, etc. Es decir que un vertex shader ejecutara exactamente las mismas operaciones para cada vértice en paralelo. 
+Según el paradigma SIMD, solo puede ejecutarse un único shader en cada GPU pero los datos pueden ser distintos: en el caso de los vertex shaders, por ejemplo, cada unidad de procesamiento tendrá acceso a las coordenadas geométricas de un vértice, las coordenadas de textura de ese vértice, etc. Es decir que un vertex shader ejecutara exactamente las mismas operaciones para cada vértice en paralelo. 
 
 \clearpage
 
@@ -123,21 +123,21 @@ Según el paradigma SIMD, solo puede ejecutarse único shader en cada GPU pero l
 La principal limitación de los shaders es que solo trabajan con datos relacionados con el renderizado de gráficos (coordenadas de vértices, coordenadas de textura, vectores normales, texturas, etc). Si un programador quería utilizar la capacidad de computo en paralelo de las GPU para problemas distintos al renderizado por rasterizado de gráficos, debía buscar la manera de codificar los datos del problema en forma de vértices y texturas, lo cual podía resultar tedioso o complicado.
 
 \medskip
-Debido a esta necesidad los fabricantes de GPU empezaron a buscar una forma de ampliar las capacidades de computo que ofrecían sus dispositivos y desarrollaron plataformas de programación genérica en GPUs. La primera de estas plataformas fue la desarrollada por Nvidia con el nombre CUDA para sus tarjetas gráficas. Posteriormente se desarrollo OpenCL, un estándar de computo en paralelo tanto para GPUs como para CPUs soportado por la mayoría de fabricantes de hardware.
+Debido a esta necesidad los fabricantes de GPU empezaron a buscar una forma de ampliar las capacidades de computo que ofrecían sus dispositivos y desarrollaron plataformas de programación genérica en GPUs. La primera de estas plataformas fue la desarrollada por Nvidia, con el nombre CUDA, para sus tarjetas gráficas. Posteriormente se desarrollo OpenCL, un estándar de computo en paralelo tanto para GPUs, como para CPUs, soportado por la mayoría de fabricantes de hardware.
 
 \subsection{CUDA}
 
-CUDA es la plataforma de computo genérico sobre GPU desarrollada por Nvidia para GPUs de Nvidia. EL compilador nvcc (NVidia C Compiler) permite tanto compilar programas con una parte en el host (CPU) y otra parte en el device (la GPU), como compilar kernels que se ejecutaran en la GPU.
+CUDA es la plataforma de computo genérico sobre GPU desarrollada por Nvidia para GPUs de Nvidia. El compilador nvcc (NVidia C Compiler) permite tanto compilar programas con una parte en el host (CPU) y otra parte en el device (la GPU), como compilar kernels, que se ejecutaran en la GPU.
 
 \subsection{OptiX}
 
-OptiX es una librería de ray tracing sobre CUDA desarrolada por Nvidia. Optix esta diseñado con la idea de ofrecer un framework para ray tracing lo mas genérico y programable posible, tratando de no limitar las posibilidades del programador.
+OptiX es una librería de ray tracing sobre CUDA desarrolada por Nvidia. Optix esta diseñado con la idea de ofrecer un framework para ray tracing lo más genérico y programable posible, tratando de no limitar las posibilidades del programador.
 
 \clearpage
 
 \section{Objetivos}
 
-El principal objetivo de este trabajo es realizar una implementación de un algoritmo de iluminación global, lo mas completo posible, usando tecnologías de GPU para aprovechar las ventajas que ofrecen estos dispositivos en cuanto a tiempo de ejecución.
+El principal objetivo de este trabajo es realizar una implementación de un algoritmo de iluminación global, lo más completo posible, usando tecnologías de GPU para aprovechar las ventajas que ofrecen estos dispositivos en cuanto a tiempo de ejecución.
 
 \medskip
 
@@ -145,7 +145,7 @@ Para ello, un primer objetivo necesario era estudiar los distintos algoritmos y 
 
 \medskip
 
-Una vez decidido el algoritmo, otro objetivo parcial necesario para alcanzar el objetivo primario es realizar un estudio teórico detallado del algoritmo en cuestión y de las técnicas y conceptos relacionados con el mismo con tal de tener una comprensión del mismo lo bastante profunda como para realizar una implementación seria.
+Una vez decidido el algoritmo, otro objetivo parcial necesario para alcanzar el objetivo primario es realizar un estudio teórico detallado del algoritmo en cuestión, y de las técnicas y conceptos relacionados con el mismo, con tal de tener una comprensión de este lo bastante profunda como para realizar una implementación seria.
 
 \medskip
 

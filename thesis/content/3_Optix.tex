@@ -1,76 +1,76 @@
 \chapter{Introducción a OptiX}
 
 
-OptiX es una librería desarrollada por Nvidia para hacer ray tracing en la GPU. OptiX fue desarrollada con el propósito de ser lo mas flexible posible y adaptarse a las necesidades del programador. Por ello solo ofrece la funcionalidad de lanzar rayos y es responsabilidad del programador implementar el funcionamiento de esos rayos: como serán lanzados, que datos portaran, que sucederá cuando intereseccionen con un objeto, etc.
+OptiX es una librería desarrollada por Nvidia para hacer ray tracing en la GPU. OptiX fue desarrollada con el propósito de ser lo más flexible posible y adaptarse a las necesidades del programador. Por ello sólo ofrece la funcionalidad de lanzar rayos y es responsabilidad del programador implementar el funcionamiento de esos rayos: como serán lanzados, que datos portarán, que sucederá cuando interseccionen con un objeto, etc.
 
 \medskip
 
 Esta funcionalidad se implementa mediante lo que en OptiX se llaman programas. Los programas de OptiX son fragmentos de código CUDA con acceso a las funciones de OptiX, básicamente para el trazado de rayos, que serán compilados por el compilador de Nvidia (nvcc) y se ensamblaran en kernels CUDA para ser ejecutados en la GPU. 
 
 \medskip
-De ahora en adelante cuando hablemos de programas nos estaremos refiriendo a estos fragmentos de codigo CUDA, cuando queramos referirnos al conjunto del sistema de renderizado que es el objeto de este trabajo usaremos la expresión aplicación o sistema. Además en el contexto de CUDA y OptiX se conoce como Device a la GPU y como Host a la CPU.
+De ahora en adelante cuando hablemos de programas nos estaremos refiriendo a estos fragmentos de codigo CUDA, cuando queramos referirnos al conjunto del sistema de renderizado, que es el objeto de este trabajo usaremos la expresión aplicación o sistema. Además en el contexto de CUDA y OptiX se conoce como Device a la GPU y como Host a la CPU.
 
 \clearpage
 
 \section{Device}
 
-OptiX tiene un conjunto de programas que pueden ser implementados. Cada uno de ellos se encarga de una tarea especifica dentro del flujo de ejecución de una aplicación OptiX. En esta sección veremos cuales son estos tipos de programas y que utilidad tiene cada uno de ellos.  
+OptiX tiene un conjunto de programas que pueden ser implementados. Cada uno de ellos se encarga de una tarea específica dentro del flujo de ejecución de una aplicación OptiX. En esta sección veremos cuales son estos tipos de programas y que utilidad tiene cada uno de ellos.  
 
 \subsection{Ray generation programs}
 
-Este tipo de programas son los puntos de entrada de una aplicación OptiX y es desde donde se crear y lanzan los rayos primarios. Típicamente, en una aplicación de renderizado se implementa la cámara en un programa de esto tipo.
+Este tipo de programas son los puntos de entrada de una aplicación OptiX y es desde donde se crean y lanzan los rayos primarios. Típicamente, en una aplicación de renderizado se implementa la cámara en un programa de esto tipo.
 
 \subsection{Intersection programs}
 
-Los programas de intersección se encargan de determinar si un rayo intersecciona con un objeto y en caso afirmativo retorna la distancia a la que se ha producido la intersección. Ademas, el programador tiene flexibilidad para calcular y retornar datos relativos a esta intersección, típicamente las coordenadas de textura, la normal a la superficie en el punto de intersección, etc.
+Los programas de intersección se encargan de determinar si un rayo intersecciona con un objeto y en caso afirmativo retorna la distancia a la que se ha producido la intersección. Además, el programador tiene flexibilidad para calcular y retornar datos relativos a esta intersección, típicamente las coordenadas de textura, la normal a la superficie en el punto de intersección, etc.
 
 \medskip
 
-El hecho de que el programador pueda determinar si se ha producido una intersección ofrece gran flexibilidad para implementar distintos tipos de superficies, desde un simple triangulo o esfera a complejas superficies procedimentales.
+El hecho de que el programador pueda determinar si se ha producido una intersección ofrece gran flexibilidad para implementar distintos tipos de superficies, desde un simple triángulo o esfera, a complejas superficies procedimentales.
 
 \subsection{Bounding box programs}
 
-Estos programas van ligados a los programas de intersección y su función es la de calcular una AABB (del inglés Axis Aligned Bounding Box) que contenga el objeto con el que están asociados. La implementación de estos programas no es obligatoria para que OptiX pueda determinar la intersección pero aceleran el proceso y son necesarios si se quiere construir una estructura de aceleración.
+Estos programas van ligados a los programas de intersección y su función es la de calcular una AABB (del inglés Axis Aligned Bounding Box) que contenga el objeto con el que están asociados. La implementación de estos programas no es obligatoria para que OptiX pueda determinar la intersección, pero aceleran el proceso y son necesarios si se quiere construir una estructura de aceleración.
 
 \subsection{Closest hit programs}
 
-Este es el tipo de programa mas interesante para el caso que nos ocupa ya que aqui es donde se calcula el resultado final de una intersección, normalmente el color de un punto en el espacio. Aquí es donde se hacen los accesos a texturas, se hace el shading y se pueden lanzar rayos recursivamente.
+Este es el tipo de programa más interesante para el caso que nos ocupa, ya que aquí es donde se calcula el resultado final de una intersección, normalmente el color de un punto en el espacio. Aquí es donde se hacen los accesos a texturas, se hace el shading y se pueden lanzar rayos recursivamente.
 
 \medskip
 
-Estos programas, como su nombre indica, se ejecutan solo para la intersección mas cercana del rayo con la escena.
+Estos programas, como su nombre indica, se ejecutan solo para la intersección más cercana del rayo con la escena.
 
 \subsection{Any hit programs}
 
 Por el contrario, los programas any hit, se ejecutan para todas las intersecciones que encuentre un rayo en su camino, a menos que explicitamente se termine la ejecución del rayo.
-Un uso típico de estos programas es para el calculo de sombras, si cualquier punto de la escena ocluye la luz se termina el rayo y se retorna este hecho. Lo cual ofrece un mayor rendimiento en contraposición a tener que esperar a encontrar la intersección mas cercana.
+Un uso típico de estos programas es para el calculo de sombras, si cualquier punto de la escena ocluye la luz, se termina el rayo y se retorna este hecho. Lo cual ofrece un mayor rendimiento en contraposición a tener que esperar a encontrar la intersección más cercana.
 
 \subsection{Otros programas}
 
-Los programas que hemos visto hasta ahora son los mas relevantes y los que ofrecen la mayoría de funcionalidades pero existen otros programas que se pueden implementar para ofrecer otras funcionalidad.
+Los programas que hemos visto hasta ahora son los más relevantes y los que ofrecen la mayoría de funcionalidades, pero existen otros programas que se pueden implementar para ofrecer otras funcionalidades.
 
 \clearpage
 
 \section{Host}
 
-Además de la parte del device que hemos visto hasta ahora, OptiX también ofrece una API en el host que sirve para encapsular y ensamblar todos los programas del device además de para hacer las transacciones de memoria entre el host y el device. Aunque la API de host es en lenguaje C, OptiX también proporciona un envoltorio de la misma en C++ que sera el que usaremos. 
+Además de la parte del device que hemos visto hasta ahora, OptiX también ofrece una API en el host que sirve para encapsular y ensamblar todos los programas del device, además de para hacer las transacciones de memoria entre el host y el device. Aunque la API de host es en lenguaje C, OptiX también proporciona un envoltorio de la misma en C++ que sera el que usaremos. 
 
 \subsection{Clase Program}
 
-La clase Program es la representación en lado host de los programas que iran al device.
-Se crea una instancia de un Programa proporcionando una cadena de caracteres con el codigo del programa compilado o una ruta al fichero que contiene el codigo compilado. 
+La clase Program es la representación en lado host de los programas que irán al device.
+Se crea una instancia de un Programa proporcionando una cadena de caracteres con el código del programa compilado o una ruta al fichero que contiene el código compilado. 
 
 \subsection{Clase Geometry}
 
-La clase geometry representa un objeto geometrico, se crea proporcionandole un Programa de intersección y un programa de bounding box.
+La clase geometry representa un objeto geométrico, se crea proporcionandole un Programa de intersección y un programa de bounding box.
 
 \subsection{Clase Material}
 
-Esta clase representa un el material de un objeto y puede contener un closest hit program y un any hit program.
+Esta clase representa el material de un objeto y puede contener un closest hit program y un any hit program.
 
 \subsection{Clase GeometryInstance}
 
-La clase GeometryInstance sirve para asociar crear una asociación entre una instancia de la clase Material y una instancia de la clase Geometry. Semanticamente lo que estamos haciendo al crear un GeomtryInstance es asociar un objeto geométrico de la escena con su material.
+La clase GeometryInstance sirve para crear una asociación entre una instancia de la clase Material y una instancia de la clase Geometry. Semánticamente lo que estamos haciendo al crear un GeomtryInstance es asociar un objeto geométrico de la escena con su material.
 
 \subsection{Clase Context}
 
@@ -78,4 +78,4 @@ Una instancia de la clase context encapsula todos los datos necesarios para la e
 
 \subsection{Buffers}
 
-Ademas de las clases que hemos visto, OptiX también permite crear buffers para pasar datos de la memoria del sistema a la VRAM del device.
+Además de las clases que hemos visto, OptiX también permite crear buffers para pasar datos de la memoria del sistema a la VRAM del device.

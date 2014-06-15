@@ -1,7 +1,7 @@
 \chapter{Fundamentos teóricos}
 
 \section{Unidades Radiométricas}
-Se conoce como radiometría al estudio de las radiaciones electromagnéticas. Ya que la luz visible es una onda electromagnética los algoritmos de renderizado que buscan el realismo se fundamentan sobre conceptos radiométricos. Por ello en esta sección haremos una pequeña introducción sobre algunos conceptos básicos que nos permitirán entender mejor los algoritmos de iluminación global.  
+Se conoce como radiometría al estudio de las radiaciones electromagnéticas. Ya que la luz visible es una onda electromagnética, los algoritmos de renderizado que buscan el realismo se fundamentan sobre conceptos radiométricos. Por ello, en esta sección, haremos una pequeña introducción sobre algunos conceptos básicos que nos permitirán entender mejor los algoritmos de iluminación global.  
 \subsection{Flujo}
 
 El flujo radiométrico mide la cantidad de energía radiante por unidad de tiempo. Sus unidades son Watts o Joules/segundo.
@@ -19,37 +19,37 @@ E = \frac{d\Phi}{dA}
 
 \clearpage
 
-\subsection{Angulo solido}
-El angulo solido no es una unidad radiométrica en si mismo pero es un concepto geométrico necesario para poder explicar otros conceptos radiométricos además de otros apartados del presente trabajo.
+\subsection{Ángulo sólido}
+El angulo sólido no es una unidad radiométrica en si mismo, pero es un concepto geométrico necesario para poder explicar otros conceptos radiométricos, además de otros apartados del presente trabajo.
 
-Podemos entender el concepto de angulo solido como la extension del angulo a las tres dimensiones.
+Podemos entender el concepto de angulo sólido como la extension del angulo a las tres dimensiones.
 \begin{figure}[h]
 \centering
 \includegraphics[width=2in]{Solid_Angle.png}
-\caption{Definición de angulo solido \cite{Haade}}
+\caption{Definición de angulo sólido \cite{Haade}}
 \end{figure}
 
-El angulo solido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas estereorradianes $[sr]$.
+El angulo sólido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas estereorradianes $[sr]$.
 \begin{equation}
 \Omega = \frac{A}{r^2}
 \end{equation}
 
 
-Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el angulo solido diferencial como:
+Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el angulo sólido diferencial como:
 
 \begin{equation}
 d \omega _ \Theta = \sin \theta d \theta d \phi
 \end{equation}
 
-Informalmente resulta sencillo entender el angulo solido si pensamos en \emph{cuan grande se ve un objeto}. Supongamos una superficie perpendicular a la dirección de visión del observador: si este objeto esta muy cerca, diremos que subtiende un angulo solido mayor que la misma superficie a una mayor distancia en la misma dirección.
+Informalmente resulta sencillo entender el angulo sólido si pensamos en \emph{cuan grande se ve un objeto}. Supongamos una superficie perpendicular a la dirección de visión del observador: si este objeto esta muy cerca, diremos que subtiende un angulo sólido mayor que la misma superficie a una mayor distancia en la misma dirección.
 
 \clearpage
 
 \subsection{Radiancia}
 
-La radiancia, también llamada intensidad por algunos autores, es probablemente la unidad radiométrica mas importante en lo que concierne al presente trabajo y a muchos de los algoritmos de iluminación global ya que su valor es invariante a lo largo de la longitud de un rayo.
+La radiancia, también llamada intensidad por algunos autores, es probablemente la unidad radiométrica más importante en lo que concierne al presente trabajo, y a muchos de los algoritmos de iluminación global, ya que su valor es invariante a lo largo de la longitud de un rayo.
 
-Esta unidad mide la irradiancia por unidad de angulo solido.
+Esta unidad mide la irradiancia por unidad de angulo sólido.
 
 \begin{equation}
 L = \frac{dE}{d\omega} = \frac{d^2\Phi}{d\omega dA\cos \theta} 
@@ -60,13 +60,13 @@ L = \frac{dE}{d\omega} = \frac{d^2\Phi}{d\omega dA\cos \theta}
 
 \section{BRDF}
 
-La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por \cite{Nicodemus1965} Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada
+La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por \cite{Nicodemus1965} Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida, y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada.
 
 \begin{equation}
 f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} = \frac{dL(x \to v)}{L(x \gets l) \cos\theta d\omega_i} 
 \end{equation}
 
-donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
+Donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz, y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
 
 La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
 
@@ -77,7 +77,7 @@ La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \
 \end{figure}
 
 
-Para obtener la radiancia total reflejada en un punto $x$ en la dirección saliente $v$ es necesario integrar sobre el angulo solido en el dominio de la hemiesfera centrada en $x$.
+Para obtener la radiancia total reflejada en un punto $x$ en la dirección saliente $v$, es necesario integrar sobre el ángulo sólido en el dominio de la hemiesfera centrada en $x$.
 
 \begin{equation}
 \label{eq:radiance_integral}
@@ -89,7 +89,7 @@ L _ o = \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i
 \subsection{Propiedades de la BRDF}
 
 Una BRDF debe cumplir ciertas propiedades para que sea físicamente plausible.
-En primer lugar debe cumplir la ley de conservación de la energía. En el caso que nos ocupa esto significa que una superficie puede absorber luz, transformándola en calor, o puede reflejarla pero en ningún caso puede reflejar mas energía lumínica que la que recibe.
+En primer lugar debe cumplir la ley de conservación de la energía. En el caso que nos ocupa, esto significa que una superficie puede absorber luz, transformándola en calor, o puede reflejarla, pero en ningún caso puede reflejar más energía lumínica que la que recibe.
 
 \begin{equation}
 \forall l, \int_{\Omega_x} f(x,l,v) (n \cdot v) d\omega_o \leq 1
@@ -98,7 +98,7 @@ En primer lugar debe cumplir la ley de conservación de la energía. En el caso 
 En términos informales esta ecuación significa que la integral de toda la luz reflejada debido a un rayo de luz entrante nunca podrá ser superior a la luz entrante por ese rayo.
 
 \medskip
-Además también debe cumplir el \emph{principio de reciprocidad de Helmholtz}, esto significa que si intercambiamos los vectores $l$ y $v$ su valor se mantiene. Este hecho cobra sentido si pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vectores $v$ y $l$ el angulo entre ellos sigue siendo el mismo.
+Además también debe cumplir el \emph{principio de reciprocidad de Helmholtz}, esto significa que si intercambiamos los vectores $l$ y $v$, su valor se mantiene. Este hecho cobra sentido si pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vectores $v$ y $l$ el ángulo entre ellos sigue siendo el mismo.
 
 \begin{equation}
 f(x, l, v) = f(x, v, l)
@@ -106,12 +106,12 @@ f(x, l, v) = f(x, v, l)
 
 \subsection{Isotropía y anisotropía de la BRDF}
 
-Una BRDF isotropica es aquella en la que su valor se mantendrá constante si aplicamos la misma rotación a $v$ y a $l$ alrededor de la normal de la superficie. Por el contrario una BRDF anisotropia cambiara su valor dependido de la rotación de $v$ y $l$ alrededor de la normal.
+Una BRDF isotrópica es aquella en la que su valor se mantendrá constante si aplicamos la misma rotación a $v$ y a $l$ alrededor de la normal de la superficie. Por el contrario una BRDF anisotrópica cambiará su valor dependido de la rotación de $v$ y $l$ alrededor de la normal.
 
 \clearpage
 
 \subsection{Modelo de Phong modificado}
-Una de las BRDFs mas usadas en los algoritmos de ray tracing estocástico es la BRDF basada en el modelo de Phong modificado, que fue descrito por primera vez por Lewis (1994) \nocite{Lewis1994} y posteriormente explorado en mas profundidad en \cite{Lafortune1994}. Esta BRDF esta basado en el conocido modelo de reflexión local de Phong \cite{Phong1975} que fue adaptado por Lewis para cumplir con el principio de conservación de la energía.
+Una de las BRDFs más usadas en los algoritmos de ray tracing estocástico es la BRDF basada en el modelo de Phong modificado, que fue descrito por primera vez por Lewis (1994) \nocite{Lewis1994} y posteriormente explorado en más profundidad en \cite{Lafortune1994}. Esta BRDF está basado en el conocido modelo de reflexión local de Phong \cite{Phong1975} que fue adaptado por Lewis para cumplir con el principio de conservación de la energía.
 
 En la forma usada por Lafortune y Willems la función aparece como:
 
@@ -119,8 +119,8 @@ En la forma usada por Lafortune y Willems la función aparece como:
 f(x, l, v) = \frac{k_d}{\pi} + k_s \frac{n + 2}{2 \pi} \cos^n\alpha
 \end{equation}
 
-donde $\alpha$ es el angulo entre la dirección de reflexión especular perfecta y $l$.
-En esta forma la función esta normalizada para conservar la energía pero además para que esto sea cierto se debe cumplir $k_d + k_s \leq 1$.
+donde $\alpha$ es el ángulo entre la dirección de reflexión especular perfecta y $l$.
+En esta forma, la función esta normalizada para conservar la energía, pero además para que esto sea cierto se debe cumplir $k_d + k_s \leq 1$.
 
 
 
@@ -140,19 +140,19 @@ Consideremos la ecuación \ref{eq:radiance_integral}  y consideremos que además
 L _ o = L_e + \int_{\Omega_x} f(x, l, v) L_i(l) (l \cdot n) d\omega_i 
 \end{equation}
 
-Es decir, que la radiancia total $L_o$ que sale de un punto $x$ es igual a la suma de la radiancia emitida por ese punto en la dirección de salida $v$ mas la integral de toda la radiancia que llega a ese punto y es reflejada en la dirección de salida.
+Es decir, que la radiancia total $L_o$ que sale de un punto $x$ es igual a la radiancia emitida por ese punto en la dirección de salida $v$ más la integral de toda la radiancia que llega a ese punto y es reflejada en la dirección de salida.
 \medskip
 
-Lo significativo de esta ecuación es que resulta muy intuitivo derivar algoritmos de renderizado de la misma: se evalúa para cada punto a pintar y se evalúa $L_i$ recursivamente hasta que se cumpla determinada condición.
+Lo significativo de esta ecuación, es que resulta muy intuitivo derivar algoritmos de renderizado de la misma: se evalúa para cada punto a pintar y se evalúa $L_i$ recursivamente hasta que se cumpla determinada condición.
 \medskip
 
 El problema es que no parece factible encontrar una solución analítica de esta ecuación y por este motivo se aplican métodos de integración numérica para aproximar una solución.
 
 \clearpage
 
-\section{El método de montecarlo}
+\section{El método de Montecarlo}
 
-El método de montecarlo se trata de un método de integración numérico para integrales definidas sobre un dominio de dimension arbitraria, del tipo:
+El método de Montecarlo se trata de un método de integración numérico para integrales definidas sobre un dominio de dimension arbitraria, del tipo:
 \begin{equation}
 I = \int_D f(x)dx , D \subseteq \mathbb{R}^m
 \end{equation}
@@ -164,7 +164,7 @@ E(f(x)) = \int f(x)p(x)dx \approx \frac{1}{N} \sum _{i=1} ^N f(x_i)
 \end{equation}
 
 
-El método de montecarlo se basa en este hecho para estimar el valor de una integral definida tomando muestras aleatorias sobre el dominio $x_1, x_2, ..., x_n \in D$ y aplicando:
+El método de Montecarlo se basa en este hecho para estimar el valor de una integral definida tomando muestras aleatorias sobre el dominio $x_1, x_2, ..., x_n \in D$ y aplicando:
 
 \begin{equation}
 \label{eq:montecarlo}
@@ -186,7 +186,7 @@ El error en una estimación de este tipo se reduce a medida que $N$ crece.
 
 \subsection{Muestreo de importancia}
     
-Otra forma de reducir el error a parte de tomar mas muestras es tomarlas de forma mas inteligente. Anteriormente hemos supuesto que tomamos las muestras de una distribución uniforme sobre el dominio pero el método de montecarlo no impone ninguna limitación en este aspecto. Lo que implica que podemos tomar las muestras de otro tipo de distribuciones que sean mas apropiadas para cada caso. Por ejemplo tomando mas muestras en aquellas partes del dominio de integración que sean mas interesantes o importantes para nuestros propósitos.
+Otra forma de reducir el error a parte de tomar más muestras es tomarlas de forma más inteligente. Anteriormente hemos supuesto que tomamos las muestras de una distribución uniforme sobre el dominio, pero el método de Montecarlo no impone ninguna limitación en este aspecto. Esto implica que podemos tomar las muestras de otro tipo de distribuciones, que sean más apropiadas para cada caso. Por ejemplo tomando más muestras en aquellas partes del dominio de integración que sean más interesantes o importantes para nuestros propósitos.
 
 \medskip
 
@@ -194,42 +194,42 @@ Para ello basta con tomar las muestras $x_1, x_2, ..., x_n$ según la distribuci
 
 \subsection{Muestreo estratificado}
 
-El muestreo estratificado es otro método para reducir la variancia de la estimación. En este caso lo que se hace es dividir el dominio de la integral en regiones y aplicar montecarlo para cada región. 
+El muestreo estratificado es otro método para reducir la varianza de la estimación. En este caso lo que se hace es dividir el dominio de la integral en regiones y aplicar Montecarlo para cada región. 
 
 \clearpage
 
 \section{Aplicaciones del muestreo de importancia}
 
-En esta sección veremos dos aplicaciones practicas en los algoritmos de ray tracing estocástico del muestreo de importancia y como usando esta técnica es posible reducir el numero de muestras necesarias para obtener una buena estimación de la integral.
+En esta sección veremos dos aplicaciones prácticas en los algoritmos de ray tracing estocástico del muestreo de importancia y como usando esta técnica es posible reducir el número de muestras necesarias para obtener una buena estimación de la integral.
 
 
 \subsection{Muestreo de la BRDF}
 \label{muestreo_brdf}
-Aunque algunos de los conceptos explicados aquí son aplicables a otros modelos, para esta explicación nos centraremos en la BRDF de Phong modificada, ya que es la usada en nuestra implementación además de una de las mas exploradas \cite{Lafortune1994}.
+Aunque algunos de los conceptos explicados aquí son aplicables a otros modelos, para esta explicación nos centraremos en la BRDF de Phong modificada, ya que es la usada en nuestra implementación, además de una de las más exploradas \cite{Lafortune1994}.
 
 
 
 \medskip
 
-El problema que nos ocupa se nos presenta cuando tenemos que estimar la luz que llega a un punto del espacio. Una aproximación \emph{naive}, sin usar muestreo de importancia, seria muestrear uniformemente direcciones en la hemiesfera y evaluar la BRDF para cada dirección. Esto puede funcionar bien cuando se trata de materiales puramente difusos, sin componente especular o con un lóbulo especular muy abierto. Por el contrario en el caso de encontrarnos con una superficie altamente especular, como por ejemplo un metal, la cantidad de muestras necesarias para obtener una estimación decente seria desorbitada ya que la probabilidad de elegir una dirección dentro del lóbulo especular seria muy pequeña.
+El problema que nos ocupa se nos presenta cuando tenemos que estimar la luz que llega a un punto del espacio. Una aproximación \emph{naive}, sin usar muestreo de importancia, seria muestrear uniformemente direcciones en la hemiesfera y evaluar la BRDF para cada dirección. Esto puede funcionar bien cuando se trata de materiales puramente difusos, sin componente especular o con un lóbulo especular muy abierto. Por el contrario en el caso de encontrarnos con una superficie altamente especular, como por ejemplo un metal, la cantidad de muestras necesarias para obtener una estimación decente seria desorbitada, ya que la probabilidad de elegir una dirección dentro del lóbulo especular seria muy pequeña.
 
 \medskip
-Cuando nos encontremos en la tesitura de tener que muestrear proporcionalmente a la BRDF lo primero que habrá que tener en cuenta sera decidir si muestrear la parte difusa o la parte especular de la BRDF de forma proporcional a las características del material en cuestión. Es decir que para un rayo, la probabilidad de muestrear el lóbulo difuso sera de $k_d$, la probabilidad de muestrear el lóbulo especular sera $k_s$ y la probabilidad de ser absorbido sera $1 - k_d - k_s$.
+Cuando nos encontremos en la tesitura de tener que muestrear proporcionalmente a la BRDF, lo primero que habrá que tener en cuenta será decidir si muestrear la parte difusa o la parte especular de la BRDF, de forma proporcional a las características del material en cuestión. Es decir que para un rayo, la probabilidad de muestrear el lóbulo difuso sera de $k_d$, la probabilidad de muestrear el lóbulo especular sera $k_s$ y la probabilidad de ser absorbido sera $1 - k_d - k_s$.
 
 \medskip
 
-Para ello generaremos un numero aleatorio $0 \leq r \leq 1$ y si
+Para ello generaremos un número aleatorio $0 \leq r \leq 1$ y si
 $r \leq k_s$ muestrearemos la parte especular,
 si $k_s < r \leq k_s + k_d$ muestrearemos la parte difusa
 y si $k_s + k_d < r$ el rayo sera absorbido por el material.
 
 \medskip
 
-Una vez decidido el evento a evaluar procederemos de forma distinta según cada caso. En el caso de evaluar la parte difusa podemos muestrear uniformente sobre la hemiesfera o podemos muestrear usando una distribución coseno como defienden algunos autores.
+Una vez decidido el evento a evaluar procederemos de forma distinta según cada caso. En el caso de evaluar la parte difusa, podemos muestrear uniformemente sobre la hemiesfera o podemos muestrear usando una distribución coseno como defienden algunos autores.
 
 \clearpage
 
-Una forma sencilla de obtener puntos distribuidos con densidad de coseno en la hemiesfera es generar puntos uniformemente sobre un circulo unitario y luego proyectarlos a la hemiesfera.
+Una forma sencilla de obtener puntos distribuidos con densidad de coseno en la hemiesfera es generar puntos uniformemente sobre un círculo unitario y luego proyectarlos a la hemiesfera.
 Para ello generamos dos números aleatorios $r_1$ y $r_2$ en el intervalo $[0, 1]$ y hacemos:
 
 \smallskip
@@ -250,7 +250,7 @@ $l = (x, y, z)$
 
 \medskip
 
-En este caso la funcion de densidad de probabilidad (pdf) es
+En este caso la función de densidad de probabilidad (pdf) es
 
 \smallskip
 
@@ -258,13 +258,13 @@ En este caso la funcion de densidad de probabilidad (pdf) es
 pdf(l_{diff}) = \frac{(l \cdot n)}{\pi}
 \end{equation}
 
-La parte mas interesante es muestrear el lóbulo especular de la BRDF. Una buena explicación del procedimiento se encuentra en \cite{Lafortune1994}. En este caso la función de densidad de probabilidad es
+La parte más interesante es muestrear el lóbulo especular de la BRDF. Una buena explicación del procedimiento se encuentra en \cite{Lafortune1994}. En este caso la función de densidad de probabilidad es
 
 \begin{equation}
 pdf(l_{spec}) = \frac{n + 1}{2\pi}\cos^m\theta
 \end{equation}
 
-Siendo $\theta$ el angulo entre $l$ y el vector $R = -v + 2n(n \cdot v)$, es decir $v$ reflejado respecto a la normal, que es la dirección de reflexión especular perfecta. De este modo conseguiremos direcciones mas parecidas a $R$ cuanto mayor sea el exponente especular.
+Siendo $\theta$ el ángulo entre $l$ y el vector $R = -v + 2n(n \cdot v)$, es decir $v$ reflejado respecto a la normal, que es la dirección de reflexión especular perfecta. De este modo conseguiremos direcciones más parecidas a $R$ cuanto mayor sea el exponente especular.
 
 \medskip
 
@@ -289,45 +289,45 @@ L(x \to v) = \frac{L(x \gets l)k_s(n \cdot l)(R \cdot l)^n}{q_2 pdf_{spec}(l)}
 \end{equation}
 siendo $R$ el vector $v$ reflejado respecto a la normal.
 
-si el rayo es absorbido la contribución es $0$.
+si el rayo es absorbido, la contribución es $0$.
 
 
 
 
 \clearpage
 
-\subsection{Muestreo del angulo solido subtendido}
+\subsection{Muestreo del ángulo sólido subtendido}
 \label{sample_solid}
 
-Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear un fuente de luz sera necesario integrar el angulo solido subtendido por dicha fuente de luz. A priori, no sabemos si la fuente de luz estará ocluida pero si que podemos saber que angulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega, por lo tanto la idea sera lanzar solo rayos dentro de este angulo solido para que vayan dirigidos hacia la fuente de luz.
+Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear una fuente de luz será necesario integrar el ángulo sólido subtendido por dicha fuente de luz. A priori, no sabemos si la fuente de luz estará ocluida, pero si que podemos saber que ángulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega. Por lo tanto, la idea será lanzar solo rayos dentro de este ángulo sólido para que vayan dirigidos hacia la fuente de luz.
 
 \medskip
 
-Para proceder de este modo sera necesario calcular el angulo solido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos utilizado luces esféricas pero es posible aplicar un método similar para luces poligonales.
+Para proceder de este modo sera necesario calcular el ángulo sólido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos utilizado luces esféricas, pero es posible aplicar un método similar para luces poligonales.
 
 \subsubsection{Esfera}
 
-Para el muestreo del angulo sólido subtendido por una luz esférica nos basaremos en el método propuesto en \cite{Shirley1996}.
+Para el muestreo del ángulo sólido subtendido por una luz esférica nos basaremos en el método propuesto en \cite{Shirley1996}.
 
 \medskip
 
-En primero lugar tenemos que calcular el angulo solido en relación al punto $x$ subtendido por una esfera de radio $r$ centrada en $c$. Llamaremos $\theta_{max}$ al angulo entre la dirección del vector $c - x$ y una recta tangente a la esfera que pasa por $x$. Entonces
+En primer lugar tenemos que calcular el ángulo sólido en relación al punto $x$ subtendido por una esfera de radio $r$ centrada en $c$. Llamaremos $\theta_{max}$ al ángulo entre la dirección del vector $c - x$ y una recta tangente a la esfera que pasa por $x$. Entonces
 
 \begin{equation}
 \cos \theta_{max} = \sqrt{1 - \sin^2 \theta_{max}} = \sqrt{ 1 - \left(\frac{r}{\lVert c - x \rVert} \right)^2 }
 \end{equation}
 
-Según la definición de angulo solido el angulo solido subtendido por la esfera en $x$ es:
+El ángulo sólido subtendido por la esfera en $x$ según su definición es:
 
 \begin{equation}
 \omega_x = 2\pi (1 - cos \theta_{max})
 \end{equation}
 
-La función de densidad de probabilidad de muestrear una dirección cualquiera $l$ dentro del angulo sólido sera la inversa del angulo solido subtendido es decir $p(l) = \frac{1}{\omega_x}$.
+La función de densidad de probabilidad de muestrear una dirección cualquiera $l$ dentro del ángulo sólido será la inversa del ángulo sólido subtendido es decir $p(l) = \frac{1}{\omega_x}$.
 
 \medskip
 
-Para obtener direcciones dentro del angulo sólido $\omega_x$ generamos dos números aleatorios $r_1$ y $r_2$ uniformemente en el rango $[0, 1]$, la dirección en coordenadas esféricas sera:
+Para obtener direcciones dentro del ángulo sólido $\omega_x$ generamos dos números aleatorios $r_1$ y $r_2$ uniformemente en el rango $[0, 1]$, la dirección en coordenadas esféricas será:
 
 \begin{equation}
 (\theta, \phi) = (\arccos (1 + r_1 (\cos \theta_{max} - 1)), 2\pi r_2);
@@ -335,7 +335,7 @@ Para obtener direcciones dentro del angulo sólido $\omega_x$ generamos dos núm
 
 \clearpage
 
-Para obtener la dirección del vector $l$ en coordenadas absolutas creamos una base ortonormal $(u, v, w)$ con $w = \frac{c - x}{\lVert c - x \rVert}$ y multiplicamos la matriz de la base ortonormal por la representación en coordenadas cartesianas de la dirección que hemos obtenido.
+Para obtener la dirección del vector $l$ en coordenadas absolutas, creamos una base ortonormal $(u, v, w)$ con $w = \frac{c - x}{\lVert c - x \rVert}$ y multiplicamos la matriz de la base ortonormal por la representación en coordenadas cartesianas de la dirección que hemos obtenido.
 
 \begin{equation}
 l = \begin{pmatrix}

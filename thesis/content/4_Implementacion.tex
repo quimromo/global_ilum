@@ -4,11 +4,11 @@ En este capitulo analizaremos la implementación realizada de los conceptos teó
 
 \medskip
 
-El diseño de la aplicación esta basado en el patrón de software \emph{facade} con la idea de ofrecer una interfaz en C++ de tipo librería de alto nivel, reutilizable y fácil de usar, que permita realizar renderizados realistas sin tener que preocuparse de los detalles de bajo nivel relativos a OptiX y CUDA ni de todos los conceptos teóricos involucrados.
+El diseño de la aplicación esta basado en el patrón de software \emph{facade} con la idea de ofrecer una interfaz en C++ de tipo librería de alto nivel, reutilizable y fácil de usar, que permita realizar renderizados realistas sin tener que preocuparse de los detalles de bajo nivel relativos a OptiX y CUDA, ni de todos los conceptos teóricos involucrados.
 
 \medskip
 
-Además sobre esta interfaz se ha construido un parser de escenas XML, para hacer aun mas sencillo el acto de configurar y crear escenas.
+Además sobre esta interfaz se ha construido un parser de escenas XML, para hacer aún más sencillo el acto de configurar y crear escenas.
 
 \clearpage
 
@@ -16,7 +16,7 @@ Además sobre esta interfaz se ha construido un parser de escenas XML, para hace
 
 \subsection{Estructura TCamera}
 
-Este tipo de datos representa la cámara de la escena y encapsula todos los datos relativos a la cámara. Para construir un objeto de este tipo le pasamos la posición de la cámara, el posición del objetivo y el angulo de campo de visión.
+Este tipo de datos representa la cámara de la escena y encapsula todos los datos relativos a la cámara. Para construir un objeto de este tipo le pasamos la posición de la cámara, la posición del objetivo y el ángulo de campo de visión.
 
 \subsection{TSphereLight}
 
@@ -28,7 +28,7 @@ Es una estructura que representa un modelo 3D en formato .obj. Se construye pas�
 
 \subsection{Clase CPathtracer}
 
-Este es el tipo de datos mas relevante de nuestra interfaz. Todos los datos relativos a la escena y al renderizado son finalmente encapsulados en un objeto de este tipo. Una vez configurado, es el responsable de cargar los programas de OptiX y construir el \emph{Context} de OptiX y controlar la ejecución del mismo.
+Este es el tipo de datos más relevante de nuestra interfaz. Todos los datos relativos a la escena y al renderizado son finalmente encapsulados en un objeto de este tipo. Una vez configurado, es el responsable de cargar los programás de OptiX y construir el \emph{Context} de OptiX y controlar la ejecución del mismo.
 
 \subsection{Uso de la interfaz de programación}
 
@@ -83,19 +83,19 @@ En primer lugar creamos una instancia de la clase CPathtracer para seguidamente 
 
 \medskip
 
-Seguidamente usamos la instrucción \emph{pt.setSqrtSamplesPerPixel(sqrtspp} para especificar el numero de muestras por pixel. El valor que toma este método es la raíz cuadrada del numero de muestras. Lo hacemos de este modo para asegurarnos de que la división de cada pixel se hará en regiones uniformes dividiendo el pixel en \emph{sqrtspp} filas y \emph{sqrtspp} columnas.
+Seguidamente usamos la instrucción \emph{pt.setSqrtSamplesPerPixel(sqrtspp} para especificar el número de muestras por pixel. El valor que toma este método es la raíz cuadrada del número de muestras. Lo hacemos de este modo para asegurarnos de que la división de cada pixel se hará en regiones uniformes, dividiendo el pixel en \emph{sqrtspp} filas y \emph{sqrtspp} columnas.
 
 \medskip
 
-En la siguiente linea, especificamos un tamaño aproximado de los bloques en los que dividiremos la imagen. Entraremos en mas detalle sobre este comportamiento en las secciones siguientes pero de momento quedémonos con la idea de que la instrucción \emph{pt.setBlockSize(200u);} le dice al renderizador que debe dividir la imagen en bloques de aproximadamente 200x200 pixels. 
+En la siguiente linea, especificamos un tamaño aproximado de los bloques en los que dividiremos la imagen. Entraremos en más detalle sobre este comportamiento en las secciones siguientes, pero de momento quedémonos con la idea de que la instrucción \emph{pt.setBlockSize(200u);} le dice al renderizador que debe dividir la imagen en bloques de aproximadamente 200x200 pixels. 
 
 \medskip
 
-A continuación especificamos la profundidad de recursión máxima. Este valor equivale al numero de veces que un rayo rebotara por la escena antes de ser terminado. Hay que calibrar bien este valor ya que un valor muy bajo produciría una iluminación pobre de la escena y un valor demasiado alto incrementaría el tiempo de ejecución innecesariamente.
+A continuación especificamos la profundidad de recursión máxima. Este valor equivale al número de veces que un rayo rebotará por la escena antes de ser terminado. Hay que calibrar bien este valor, ya que un valor muy bajo produciría una iluminación pobre de la escena y un valor demasiado alto incrementaría el tiempo de ejecución innecesariamente.
 
 \medskip
 
-Seguidamente le pasamos al pathtracer un objeto de tipo TCamara inicializado con los valores de posición, objetivo y angulo de visión deseado. Solo puede haber una cámara activa a la vez por lo que la clase CPathtracer siempre usara la ultima que le especifiquemos.
+Seguidamente le pasamos al pathtracer un objeto de tipo TCamara inicializado con los valores de posición, objetivo y ángulo de visión deseado. Sólo puede haber una cámara activa a la vez por lo que la clase CPathtracer siempre usará la última que le especifiquemos.
 
 \medskip
 
@@ -107,7 +107,7 @@ El método \emph{prepare} toma todos los datos de configuración que hemos espec
 
 \medskip
 
-Usamos la instrucción \emph{pt.renderAllSamples()} para efectuar un renderizado completo, de la imagen que tomara tantas muestras como hayamos especificado, y por ultimo guardamos el resultado en una fichero TGA. Por simplicidad en este ejemplo hemos usado el método \emph{renderAllSample} pero también existe la opción de renderizadar solo una muestra por pixel por llamada con el método \emph{void renderNextSample()}, este método sera útil cuando queramos dar un feedback visual del progreso del renderizado, calculando una muestra y pintando en pantalla el resultado cada vez.
+Usamos la instrucción \emph{pt.renderAllSamples()} para efectuar un renderizado completo, de la imagen que tomará tantas muestras como hayamos especificado, y por último guardamos el resultado en una fichero TGA. Por simplicidad en este ejemplo hemos usado el método \emph{renderAllSample}, pero también existe la opción de renderizar sólo una muestra por pixel por llamada con el método \emph{void renderNextSample()}. Este método sera útil cuando queramos dar un feedback visual del progreso del renderizado, calculando una muestra y pintando en pantalla el resultado cada vez.
 
 \clearpage
 
@@ -125,7 +125,7 @@ La solución que encontramos fue dividir la imagen en bloques de menor tamaño y
 
 \subsection{Host}
 
-En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vetores de la base ortonormal del sistema de coordenadas de cámara (front, left, up) y la relación (viewd) entre el vector front y el vector up en función del angulo de visión fov.
+En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vectores de la base ortonormal del sistema de coordenadas de cámara (front, left, up) y la relación (viewd) entre el vector front y el vector up en función del ángulo de visión fov.
 
 \begin{lstlisting}
 TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
@@ -169,7 +169,7 @@ float3 ray_origin = eye;
 float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
 \end{lstlisting}
 
-El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él indice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel estamos pintando, en coordenadas absolutas de la imagen entera.
+El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él indice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
 
 \medskip
 
@@ -194,11 +194,11 @@ En primer lugar decidimos aleatoriamente si muestrear la parte difusa o la parte
 
 \medskip
 
-Generamos un un numero aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestreamos la parte especular, si $p_{spec} < r \leq p_{spec} + p_{diff}$ la parte difusa, en caso contrario el rayo es absorbido y terminamos la recursión del mismo.
+Generamos un un número aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestreamos la parte especular, si $p_{spec} < r \leq p_{spec} + p_{diff}$ la parte difusa, en caso contrario el rayo es absorbido y terminamos la recursión del mismo.
 
 \medskip
 
-Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnica de reducción de la variancia usado en integraciones por monte carlo. Para compensar esta terminación anticipada y la separación entre rayos difusos y especular dividiremos el resultado entre la probabilidad de que se lance ese rayo. Ya que se muestrea con mas probabilidad el evento mas probable esto servirá para dar mas peso a aquellas muestras menos probables.
+Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnica de reducción de la varianza usado en integraciones por Montecarlo. Para compensar esta terminación anticipada y la separación entre rayos difusos y especular dividiremos el resultado entre la probabilidad de que se lance ese rayo. Ya que se muestrea con más probabilidad el evento más probable esto servirá para dar más peso a aquellas muestras menos probables.
 
 \subsection{Muestreo de la parte difusa de la BRDF}
 En el programa de closest hit, muestreamos la hemiesfera centrada en el punto de intersección para tener una estimación de la luz incidente.
@@ -230,12 +230,12 @@ Básicamente lo que hace es, en el caso de que no hayamos llegado a la profundid
 \medskip
 
 Hay que hacer notar que en la instrucción \emph{color += brdfLight * Kd / prob\_diff;} no estamos multiplicando por el típico factor coseno de la normal y la luz. No lo hacemos porque al tomar la muestra con densidad coseno y dividir entre la densidad de probabilidad de esa muestra los factores coseno se anulan.
-Siguiendo con ese razonamiento y teniendo en cuenta que la densidad coseno es $\frac{cos(l,n)}{\pi}$ deberíamos multiplicar el resultado por $\pi$ para ser coherentes con la teoría pero lo hemos quitado del cálculo porque hemos comprobado empíricamente que el resultado final es mas satisfactorio sin ese factor, que en caso de incluirlo en el cálculo generaba imágenes excesivamente iluminadas y quemadas.
+Siguiendo con ese razonamiento y teniendo en cuenta que la densidad coseno es $\frac{cos(l,n)}{\pi}$ deberíamos multiplicar el resultado por $\pi$ para ser coherentes con la teoría, pero lo hemos quitado del cálculo porque hemos comprobado empíricamente que el resultado final es más satisfactorio sin ese factor, que en caso de incluirlo en el cálculo generaba imágenes excesivamente iluminadas y quemadas.
 
 \medskip
 
-Usando tan solo esta función de iluminación ya es posible generar renderizados aunque al no muestrear las luces directamente tardaran mas en converger.
-En las primeras fases de la implementación realizamos algunos renderizados con este closest hit program, y un closest hit program para las fuentes de luz que devolvía su emisión de luz.
+Usando solamente esta función de iluminación ya es posible generar renderizados, aunque al no muestrear las luces directamente tardarán más en converger.
+En las primeras fases de la implementación realizamos algunos renderizados con este closest hit program, y un closest hit program para las fuentes de luz que devolvía su emisión de luz. Un ejemplo de ello puede verse en la siguiente figura.
 
 
 \begin{figure}[h]
@@ -248,7 +248,7 @@ En las primeras fases de la implementación realizamos algunos renderizados con 
 
 \subsection{Muestreo de la parte especular de la BRDF}
 
-En el caso de la parte especular usamos como densidad de probabilidad una potencia de coseno de forma que el exponente sea mayor cuanto mas reflectante sea el material. Ese vector es posteriormente transformado con una base ortonormal orientada hacia la dirección de reflexion perfecta.
+En el caso de la parte especular usamos como densidad de probabilidad una potencia de coseno de forma que el exponente sea mayor cuanto más reflectante sea el material. Ese vector es posteriormente transformado con una base ortonormal orientada hacia la dirección de reflexion perfecta.
 
 \begin{lstlisting}
 	float3 eye = -ray.direction;
@@ -276,14 +276,14 @@ La función \emph{sample\_specular2} genera una dirección aleatoria con una den
 \begin{figure}
 \centering
 \includegraphics[width=5in]{compare_specular2_burned.png}
-\caption{Arriba exponente especular de 64, abajo exponente de 512. Se puede apreciar que cuanto mayor sea el exponente mas reflejante sera el material.}
+\caption{Arriba exponente especular de 64, abajo exponente de 512. Se puede apreciar que cuanto mayor sea el exponente más reflectante sera el material.}
 \end{figure}
 
 \clearpage
 
 \section{Muestreo de luces}
 
-Una mejora importante que hemos implementado ha sido el muestreo directo de fuentes de luz. Muestrear las luces directamente provoca que el renderizado converja mas rápido al lanzar rayos hacia zonas de la escena que es mas probable que aporten luz al computo final.
+Una mejora importante que hemos implementado ha sido el muestreo directo de fuentes de luz. Muestrear las luces directamente provoca que el renderizado converja más rápido al lanzar rayos hacia zonas de la escena que es más probable que aporten luz al computo final.
 
 \begin{lstlisting}
 
@@ -326,7 +326,7 @@ Para cada luz esférica calculamos la distancia del punto que estamos evaluando 
 \medskip
 
 
-A continuación procedemos a generar una dirección dentro del angulo sólido subtendido por la esfera, tal como se ha explicado en la sección \ref{sample_solid}. Si dicha dirección forma un angulo superior a noventa grados con respecto a la normal la omitimos.
+A continuación procedemos a generar una dirección dentro del ángulo sólido subtendido por la esfera, tal como se ha explicado en la sección \ref{sample_solid}. Si dicha dirección forma un ángulo superior a noventa grados con respecto a la normal la omitimos.
 
 \begin{figure}[h]
 \centering
