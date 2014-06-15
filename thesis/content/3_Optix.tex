@@ -1,7 +1,7 @@
 \chapter{Introducción a OptiX}
 
 
-OptiX es una librería desarrollada por Nvidia para hacer ray tracing en la GPU. OptiX fue desarrollada con el propósito de ser lo mas flixible posible y adaptarse a las necesidades del programador. Por ello solo ofrece la funcionalidad de lanzar rayos y es responsabilidad del programador implementar el funcionamiento de esos rayos: como seran lanzados, que datos portaran, que sucederá cuando intereseccionen con un objeto, etc.
+OptiX es una librería desarrollada por Nvidia para hacer ray tracing en la GPU. OptiX fue desarrollada con el propósito de ser lo mas flexible posible y adaptarse a las necesidades del programador. Por ello solo ofrece la funcionalidad de lanzar rayos y es responsabilidad del programador implementar el funcionamiento de esos rayos: como serán lanzados, que datos portaran, que sucederá cuando intereseccionen con un objeto, etc.
 
 \medskip
 
@@ -18,7 +18,7 @@ OptiX tiene un conjunto de programas que pueden ser implementados. Cada uno de e
 
 \subsection{Ray generation programs}
 
-Este tipo de programas son los puntos de entrada de una aplicación OptiX y es desde donde se crear y lanzan los rayos primarios. Tipicamente, en una aplicación de renderizado se implementa la cámara en un programa de esto tipo.
+Este tipo de programas son los puntos de entrada de una aplicación OptiX y es desde donde se crear y lanzan los rayos primarios. Típicamente, en una aplicación de renderizado se implementa la cámara en un programa de esto tipo.
 
 \subsection{Intersection programs}
 
@@ -30,7 +30,7 @@ El hecho de que el programador pueda determinar si se ha producido una intersecc
 
 \subsection{Bounding box programs}
 
-Estos programas van ligados a los programas de intersección y su función es la de calcular una AABB (del inglés Axis Aligned Bounding Box) que contenga el objeto con el que estan asociados. La implementación de estos programas no es obligatoria para que OptiX pueda determinar la intersección pero aceleran el proceso y son necesarios si se quiere construir una estructura de aceleración.
+Estos programas van ligados a los programas de intersección y su función es la de calcular una AABB (del inglés Axis Aligned Bounding Box) que contenga el objeto con el que están asociados. La implementación de estos programas no es obligatoria para que OptiX pueda determinar la intersección pero aceleran el proceso y son necesarios si se quiere construir una estructura de aceleración.
 
 \subsection{Closest hit programs}
 
@@ -47,7 +47,7 @@ Un uso típico de estos programas es para el calculo de sombras, si cualquier pu
 
 \subsection{Otros programas}
 
-Los programas que hemos visto hasta ahora son los mas relevantes y los que ofrecen la mayoría de funcionalides pero existen otros programas que se pueden implementar para ofrecer otras funcionalidad.
+Los programas que hemos visto hasta ahora son los mas relevantes y los que ofrecen la mayoría de funcionalidades pero existen otros programas que se pueden implementar para ofrecer otras funcionalidad.
 
 \clearpage
 

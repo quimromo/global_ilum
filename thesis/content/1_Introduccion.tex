@@ -65,7 +65,7 @@ Evidentemente este proceso de trazar un rayo desde la cámara y hacerlo rebotar 
 El algoritmo de Bidirectional path tracing \cite{Lafortune1993} fue desarrollado como una extensión al algoritmo de path tracing de Kajiya. En esta modalidad los rayos primarios no solo se lanzan desde la cámara sino también desde las fuentes de luz. Estos caminos de luz, se calculan del mismo modo que los de la cámara. Se guardan los puntos de intersección de los caminos de la cámara y los de la luz y en una ultima fase se unen estos dos grupos de puntos para obtener la evaluación final del camino.
 
 \medskip
-La principal mejora de este algoritmo respecto a su antecesor es que es capaz de funcionar mejor y converger mas rápido hacia una solución correcta en escenas complejas en las que las fuentes de luz no son facilmente visibles desde la mayoria de puntos de la escena.
+La principal mejora de este algoritmo respecto a su antecesor es que es capaz de funcionar mejor y converger mas rápido hacia una solución correcta en escenas complejas en las que las fuentes de luz no son facilmente visibles desde la mayoría de puntos de la escena.
 
 \subsection{Metropolis light transport}
 
@@ -79,10 +79,10 @@ Este algoritmo desata todo su potencial cuando se trata de renderizar interaccio
 \subsection{Photon mapping}
 
 Todos los algoritmos que estamos viendo tratan la luz como partículas y no como ondas, pero este algoritmo lo hace de un modo aun mas explicito.
-El algoritmo de Photon mapping \cite{Jensen1996} empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y segun las propiedades (BRDF) del material si el fotón sera absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
+El algoritmo de Photon mapping \cite{Jensen1996} empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y según las propiedades (BRDF) del material si el fotón sera absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
 
 \medskip
-La siguente fase, llamada final gathering, realiza un ray tracing de la escena y en cada intersección consulta el mapa de fotones para ver la cantidad de luz que llega a ese punto.
+La siguiente fase, llamada final gathering, realiza un ray tracing de la escena y en cada intersección consulta el mapa de fotones para ver la cantidad de luz que llega a ese punto.
 
 \medskip
 Este algoritmo sobresale entre todos los demás cuando se trata de renderizar causticas. Pero en cambio puede producir errores cuando se renderizan superficies difusas si el numero de fotones no es muy grande.
@@ -93,7 +93,7 @@ Este algoritmo sobresale entre todos los demás cuando se trata de renderizar ca
 Este algoritmo, desarrollado por Keller en 1997 \nocite{Keller1997}, combina las ideas de los algoritmos de radiosity y photon mapping. Igual que el radiosity original, este algoritmo, en principio, solo funciona para superficies puramente difusas.
 
 \medskip
-La idea general consiste en lanzar fotones desde las fuentes de luz (como en foton mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX.
+La idea general consiste en lanzar fotones desde las fuentes de luz (como en photon mapping) e ir guardando sus posiciones. La diferencia principal radica en que en la fase de renderizado, estos fotones son tratados como luces puntuales (VPLs, del inglés Virtual Point Lights) con orientación, es decir que tienen un vector normal. La ventaja es que una vez generados estos VPL es posible renderizar la escena mediante una API gráfica tradicional acelerada por hardware como OpenGL o DirectX.
 
 \medskip
 

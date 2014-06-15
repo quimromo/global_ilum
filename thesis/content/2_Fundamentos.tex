@@ -261,10 +261,14 @@ pdf(l_{diff}) = \frac{(l \cdot n)}{\pi}
 La parte mas interesante es muestrear el lóbulo especular de la BRDF. Una buena explicación del procedimiento se encuentra en \cite{Lafortune1994}. En este caso la función de densidad de probabilidad es
 
 \begin{equation}
-pdf(l_{spec}) = \frac{n + 1}{2\pi}\cos^n\theta
+pdf(l_{spec}) = \frac{n + 1}{2\pi}\cos^m\theta
 \end{equation}
 
-I el vector resultante, en coordenadas esféricas:
+Siendo $\theta$ el angulo entre $l$ y el vector $R = -v + 2n(n \cdot v)$, es decir $v$ reflejado respecto a la normal, que es la dirección de reflexión especular perfecta. De este modo conseguiremos direcciones mas parecidas a $R$ cuanto mayor sea el exponente especular.
+
+\medskip
+
+El vector resultante de muestrear esta pdf, en coordenadas esféricas:
 
 \begin{equation}
 (\phi, \theta) = (2\pi r_1, \arccos(r_2^{\frac{1}{n+1}}) 

@@ -121,11 +121,11 @@ La solución que encontramos fue dividir la imagen en bloques de menor tamaño y
 
 \clearpage
 
-\section{Camara}
+\section{Cámara}
 
 \subsection{Host}
 
-En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vetores de la base ortonormal del sistema de coordenadas de camara (front, left, up) y la relación (viewd) entre el vector front y el vector up en función del angulo de visión fov.
+En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vetores de la base ortonormal del sistema de coordenadas de cámara (front, left, up) y la relación (viewd) entre el vector front y el vector up en función del angulo de visión fov.
 
 \begin{lstlisting}
 TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
@@ -151,7 +151,7 @@ TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
 
 \subsection{Device}
 
-En el device tenemos un programa encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parametros necesarios para lanzar el rayo correcto.
+En el device tenemos un programa encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parámetros necesarios para lanzar el rayo correcto.
 
 \begin{lstlisting}
 float2 offset = make_float2(offset_x, offset_y);
@@ -201,7 +201,7 @@ Generamos un un numero aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestream
 Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnica de reducción de la variancia usado en integraciones por monte carlo. Para compensar esta terminación anticipada y la separación entre rayos difusos y especular dividiremos el resultado entre la probabilidad de que se lance ese rayo. Ya que se muestrea con mas probabilidad el evento mas probable esto servirá para dar mas peso a aquellas muestras menos probables.
 
 \subsection{Muestreo de la parte difusa de la BRDF}
-En el programa de closest hit, muestreamos la hemiesfiera centrada en el punto de intersección para tener una estimación de la luz incidente.
+En el programa de closest hit, muestreamos la hemiesfera centrada en el punto de intersección para tener una estimación de la luz incidente.
 
 \begin{lstlisting}
 	unsigned int seed = prd_radiance.seed;
@@ -225,7 +225,7 @@ En el programa de closest hit, muestreamos la hemiesfiera centrada en el punto d
 	color += brdfLight * Kd / prob_diff;
 \end{lstlisting}
 
-Basicamente lo que hace es, en el caso de que no hayamos llegado a la profundidad de recursión máxima, muestrear un punto en la hemiesfiera con densidad de coseno, generar una base ortonormal en función de la normal de la superficie y transformar el punto de la hemiesfera con esa base. Se traza un rayo recursivamente en la dirección obtenida y el color devuelto por ese rayo se multiplica por el color difuso de la superficie.
+Básicamente lo que hace es, en el caso de que no hayamos llegado a la profundidad de recursión máxima, muestrear un punto en la hemiesfera con densidad de coseno, generar una base ortonormal en función de la normal de la superficie y transformar el punto de la hemiesfera con esa base. Se traza un rayo recursivamente en la dirección obtenida y el color devuelto por ese rayo se multiplica por el color difuso de la superficie.
 
 \medskip
 
@@ -270,6 +270,14 @@ En el caso de la parte especular usamos como densidad de probabilidad una potenc
 	}
 
 \end{lstlisting}
+
+La función \emph{sample\_specular2} genera una dirección aleatoria con una densidad de probabilidad que depende del exponente especular, tal como hemos visto en la sección \ref{muestreo_brdf}.
+
+\begin{figure}
+\centering
+\includegraphics[width=5in]{compare_specular2_burned.png}
+\caption{Arriba exponente especular de 64, abajo exponente de 512. Se puede apreciar que cuanto mayor sea el exponente mas reflejante sera el material.}
+\end{figure}
 
 \clearpage
 
@@ -326,7 +334,7 @@ A continuación procedemos a generar una dirección dentro del angulo sólido su
 \caption{  $\Delta $ al punto de intersección}
 \end{figure}
 
-La distancia a la que se encuentra el primer punto de intersección de la esfera con el rayo será $d_{intersect} = d \cos\theta - \Delta $. Este valor $\Delta = \sqrt{r^2 - (d\sin\theta)^2}$ lo calculamos en la instrucción \emph{float delta = sqrtf(radius2 - sin2theta * dist2);}. De este modo cuando creemos el rayo lo haremos con una distancia máxima que es la que nos interesa con tal de que no interseccione con objetos que estén dentro o detrás de la esfera. En las lineas 29 y 30 creamos y lanzamos el rayo. El valor \emph{shadow\_prd.contribution} será la emision de luz de la fuente que estamos muestreando o $0$ si ha interseccionado con algun objeto.
+La distancia a la que se encuentra el primer punto de intersección de la esfera con el rayo será $d_{intersect} = d \cos\theta - \Delta $. Este valor $\Delta = \sqrt{r^2 - (d\sin\theta)^2}$ lo calculamos en la instrucción \emph{float delta = sqrtf(radius2 - sin2theta * dist2);}. De este modo cuando creemos el rayo lo haremos con una distancia máxima que es la que nos interesa con tal de que no interseccione con objetos que estén dentro o detrás de la esfera. En las lineas 29 y 30 creamos y lanzamos el rayo. El valor \emph{shadow\_prd.contribution} será la emisión de luz de la fuente que estamos muestreando o $0$ si ha interseccionado con algún objeto.
 
 \medskip
 
