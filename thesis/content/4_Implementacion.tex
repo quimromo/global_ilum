@@ -1,10 +1,10 @@
 \chapter{Implementación}
 
-En este capitulo analizaremos la implementación realizada de los conceptos teóricos vistos hasta ahora y el uso practico de las tecnologías involucradas.
+En este capítulo analizaremos la implementación realizada de los conceptos teóricos vistos hasta ahora y el uso práctico de las tecnologías involucradas.
 
 \medskip
 
-El diseño de la aplicación esta basado en el patrón de software \emph{facade} con la idea de ofrecer una interfaz en C++ de tipo librería de alto nivel, reutilizable y fácil de usar, que permita realizar renderizados realistas sin tener que preocuparse de los detalles de bajo nivel relativos a OptiX y CUDA, ni de todos los conceptos teóricos involucrados.
+El diseño de la aplicación está basado en el patrón de software \emph{facade} con la idea de ofrecer una interfaz en C++ de tipo librería de alto nivel, reutilizable y fácil de usar, que permita realizar renderizados realistas sin tener que preocuparse de los detalles de bajo nivel relativos a OptiX y CUDA, ni de todos los conceptos teóricos involucrados.
 
 \medskip
 
@@ -79,7 +79,7 @@ pt.saveToTGA("render_sponza.tga");
 
 Este ejemplo sirve para ilustrar el funcionamiento de la interfaz con el motor de renderizado.
 Veamos el funcionamiento de este ejemplo:
-En primer lugar creamos una instancia de la clase CPathtracer para seguidamente especificar las dimensiones, en pixeles, de la imagen que vamos a renderizar usando el metodo \emph{void setRenderSize(unsigned int width, unsigned int height)}. 
+En primer lugar creamos una instancia de la clase CPathtracer para seguidamente especificar las dimensiones, en pixeles, de la imagen que vamos a renderizar usando el método \emph{void setRenderSize(unsigned int width, unsigned int height)}. 
 
 \medskip
 
@@ -87,7 +87,7 @@ Seguidamente usamos la instrucción \emph{pt.setSqrtSamplesPerPixel(sqrtspp} par
 
 \medskip
 
-En la siguiente linea, especificamos un tamaño aproximado de los bloques en los que dividiremos la imagen. Entraremos en más detalle sobre este comportamiento en las secciones siguientes, pero de momento quedémonos con la idea de que la instrucción \emph{pt.setBlockSize(200u);} le dice al renderizador que debe dividir la imagen en bloques de aproximadamente 200x200 pixels. 
+En la siguiente línea, especificamos un tamaño aproximado de los bloques en los que dividiremos la imagen. Entraremos en más detalle sobre este comportamiento en las secciones siguientes, pero de momento quedémonos con la idea de que la instrucción \emph{pt.setBlockSize(200u);} le dice al renderizador que debe dividir la imagen en bloques de aproximadamente 200x200 pixels. 
 
 \medskip
 
@@ -107,13 +107,13 @@ El método \emph{prepare} toma todos los datos de configuración que hemos espec
 
 \medskip
 
-Usamos la instrucción \emph{pt.renderAllSamples()} para efectuar un renderizado completo, de la imagen que tomará tantas muestras como hayamos especificado, y por último guardamos el resultado en una fichero TGA. Por simplicidad en este ejemplo hemos usado el método \emph{renderAllSample}, pero también existe la opción de renderizar sólo una muestra por pixel por llamada con el método \emph{void renderNextSample()}. Este método sera útil cuando queramos dar un feedback visual del progreso del renderizado, calculando una muestra y pintando en pantalla el resultado cada vez.
+Usamos la instrucción \emph{pt.renderAllSamples()} para efectuar un renderizado completo, de la imagen que tomará tantas muestras como hayamos especificado, y por último guardamos el resultado en una fichero TGA. Por simplicidad en este ejemplo hemos usado el método \emph{renderAllSample}, pero también existe la opción de renderizar sólo una muestra por pixel por llamada con el método \emph{void renderNextSample()}. Este método será útil cuando queramos dar un feedback visual del progreso del renderizado, calculando una muestra y pintando en pantalla el resultado cada vez.
 
 \clearpage
 
 \section{Renderizado por bloques}
 
-Durante el proceso de implementación nos encontramos con una dificultad cuando se trataba de renderizar escenas con muchos polígonos: el sistema operativo impone un limite al tiempo de ejecución de una llamada a la GPU de unos pocos segundos. Si llamábamos a la ejecución de un Context de OptiX contra toda la imagen, es decir con tantos CUDA threads como pixels, el sistema operativo paraba la ejecución antes de que esta terminara.
+Durante el proceso de implementación nos encontramos con una dificultad cuando se trataba de renderizar escenas con muchos polígonos: el sistema operativo impone un límite al tiempo de ejecución de una llamada a la GPU de unos pocos segundos. Si llamábamos a la ejecución de un Context de OptiX contra toda la imagen, es decir con tantos CUDA threads como pixels, el sistema operativo paraba la ejecución antes de que esta terminara.
 
 \medskip
 
@@ -169,11 +169,11 @@ float3 ray_origin = eye;
 float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
 \end{lstlisting}
 
-El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él indice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
+El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él índice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
 
 \medskip
 
-Para que el muestreo múltiple de cada pixel proporcione antialiasing es necesario dividir el pixel en regiones y lanzar el rayo a través de la región que se corresponde con la muestra actual. Para calcular las coordenadas de la región actual lo hacemos a partir del parámetro currentSample y de la raiz cuadrada del total de muestras (la variable sqrtspp).
+Para que el muestreo múltiple de cada pixel proporcione antialiasing es necesario dividir el pixel en regiones y lanzar el rayo a través de la región que se corresponde con la muestra actual. Para calcular las coordenadas de la región actual lo hacemos a partir del parámetro currentSample y de la raíz cuadrada del total de muestras (la variable sqrtspp).
 
 \medskip
 
@@ -198,7 +198,7 @@ Generamos un un número aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestrea
 
 \medskip
 
-Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnica de reducción de la varianza usado en integraciones por Montecarlo. Para compensar esta terminación anticipada y la separación entre rayos difusos y especular dividiremos el resultado entre la probabilidad de que se lance ese rayo. Ya que se muestrea con más probabilidad el evento más probable esto servirá para dar más peso a aquellas muestras menos probables.
+Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnica de reducción de la varianza usado en integraciones por Montecarlo. Para compensar esta terminación anticipada y la separación entre rayos difusos y especulares, dividiremos el resultado entre la probabilidad de que se lance ese rayo. Ya que se muestrea con más probabilidad el evento más probable esto servirá para dar más peso a aquellas muestras menos probables.
 
 \subsection{Muestreo de la parte difusa de la BRDF}
 En el programa de closest hit, muestreamos la hemiesfera centrada en el punto de intersección para tener una estimación de la luz incidente.
@@ -248,7 +248,7 @@ En las primeras fases de la implementación realizamos algunos renderizados con 
 
 \subsection{Muestreo de la parte especular de la BRDF}
 
-En el caso de la parte especular usamos como densidad de probabilidad una potencia de coseno de forma que el exponente sea mayor cuanto más reflectante sea el material. Ese vector es posteriormente transformado con una base ortonormal orientada hacia la dirección de reflexion perfecta.
+En el caso de la parte especular usamos como densidad de probabilidad una potencia de coseno de forma que el exponente sea mayor cuanto más reflectante sea el material. Ese vector es posteriormente transformado con una base ortonormal orientada hacia la dirección de reflexión perfecta.
 
 \begin{lstlisting}
 	float3 eye = -ray.direction;
@@ -276,14 +276,14 @@ La función \emph{sample\_specular2} genera una dirección aleatoria con una den
 \begin{figure}
 \centering
 \includegraphics[width=5in]{compare_specular2_burned.png}
-\caption{Arriba exponente especular de 64, abajo exponente de 512. Se puede apreciar que cuanto mayor sea el exponente más reflectante sera el material.}
+\caption{Arriba exponente especular de 64, abajo exponente de 512. Se puede apreciar que cuanto mayor sea el exponente más reflectante será el material.}
 \end{figure}
 
 \clearpage
 
 \section{Muestreo de luces}
 
-Una mejora importante que hemos implementado ha sido el muestreo directo de fuentes de luz. Muestrear las luces directamente provoca que el renderizado converja más rápido al lanzar rayos hacia zonas de la escena que es más probable que aporten luz al computo final.
+Una mejora importante que hemos implementado ha sido el muestreo directo de fuentes de luz. Muestrear las luces directamente provoca que el renderizado converja más rápido al lanzar rayos hacia zonas de la escena que es más probable que aporten luz al cómputo final.
 
 \begin{lstlisting}
 
@@ -334,11 +334,11 @@ A continuación procedemos a generar una dirección dentro del ángulo sólido s
 \caption{  $\Delta $ al punto de intersección}
 \end{figure}
 
-La distancia a la que se encuentra el primer punto de intersección de la esfera con el rayo será $d_{intersect} = d \cos\theta - \Delta $. Este valor $\Delta = \sqrt{r^2 - (d\sin\theta)^2}$ lo calculamos en la instrucción \emph{float delta = sqrtf(radius2 - sin2theta * dist2);}. De este modo cuando creemos el rayo lo haremos con una distancia máxima que es la que nos interesa con tal de que no interseccione con objetos que estén dentro o detrás de la esfera. En las lineas 29 y 30 creamos y lanzamos el rayo. El valor \emph{shadow\_prd.contribution} será la emisión de luz de la fuente que estamos muestreando o $0$ si ha interseccionado con algún objeto.
+La distancia a la que se encuentra el primer punto de intersección de la esfera con el rayo será $d_{intersect} = d \cos\theta - \Delta $. Este valor $\Delta = \sqrt{r^2 - (d\sin\theta)^2}$ lo calculamos en la instrucción \emph{float delta = sqrtf(radius2 - sin2theta * dist2);}. De este modo cuando creemos el rayo lo haremos con una distancia máxima que es la que nos interesa con tal de que no interseccione con objetos que estén dentro o detrás de la esfera. En las líneas 29 y 30 creamos y lanzamos el rayo. El valor \emph{shadow\_prd.contribution} será la emisión de luz de la fuente que estamos muestreando o $0$ si ha interseccionado con algún objeto.
 
 \medskip
 
-Finalmente en la ultima linea calculamos la contribución de luz de la muestra evaluando la BRDF.
+Finalmente en la última línea calculamos la contribución de luz de la muestra evaluando la BRDF.
 
 
 \begin{figure}

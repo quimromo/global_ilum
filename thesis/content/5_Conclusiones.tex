@@ -10,15 +10,36 @@
 
 \begin{figure}
 \centering
+\includegraphics[width=5in]{sibenik_difuse.png}
+\caption{La misma escena con un suelo difuso}
+\end{figure}
+
+\begin{figure}
+\centering
 \includegraphics[width=5in]{crytek_sponza1.png}
 \caption{Tres fuentes de luz poco visibles iluminan toda la escena}
 \end{figure}
 
+\clearpage
+
+\begin{figure}
+\centering
+\includegraphics[width=5in]{lion_closer.png}
+\caption{La escena anterior desde un ángulo distinto y con una única luz}
+\end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=5in]{single_light_sponza.png}
 \caption{Iluminación por una única fuente de luz}
+\end{figure}
+
+\clearpage
+
+\begin{figure}
+\centering
+\includegraphics[width=5in]{indirect.png}
+\caption{Toda la iluminación del pasillo es luz indirecta debida a rebotes difusos}
 \end{figure}
 
 \clearpage
@@ -32,7 +53,7 @@ El campo de estudio en el que se sitúa el presente trabajo es muy amplio y ha s
 
 \section{Posibles mejoras}
 
-Planteamos tres grupos de posibles mejores bien diferenciados: En primer lugar tenemos las mejoras al algoritmo usado. El algoritmo de path tracing que hemos implementado es una de sus versiones más básicas y tal como hemos comentado en la introducción existen variaciones del mismo que ofrecen mejores resultados en un menor número de muestras. Por ejemplo, una primera mejora seria implementar el transporte de luz bidireccional que ofrecería mejores resultados cuando se trata de iluminar escenas en las que la fuente de luz está muy escondida con respecto a la zona enfocada por la cámara. Otra importante mejora seria explorar e implementar modelos de BRDFs más realistas, pues el que hemos usado es de los más básicos que hay. Además, en este trabajo hemos omitido el importante fenómeno de la refractancia de la luz.
+Planteamos tres grupos de posibles mejores bien diferenciados: En primer lugar tenemos las mejoras al algoritmo usado. El algoritmo de path tracing que hemos implementado es una de sus versiones más básicas y tal como hemos comentado en la introducción existen variaciones del mismo que ofrecen mejores resultados en un menor número de muestras. Por ejemplo, una primera mejora sería implementar el transporte de luz bidireccional que ofrecería mejores resultados cuando se trata de iluminar escenas en las que la fuente de luz está muy escondida con respecto a la zona enfocada por la cámara. Otra importante mejora sería explorar e implementar modelos de BRDFs más realistas, pues el que hemos usado es de los más básicos que hay. Además, en este trabajo hemos omitido el importante fenómeno de la refractancia de la luz.
 
 \medskip
 
@@ -41,7 +62,7 @@ Una buena explicación de este uso combinado de algoritmos se puede encontrar en
 
 \medskip
 
-Por último y aunque no era el objetivo de este proyecto, una mejora interesante seria implementar una interfaz de usuario que permitiese configurar la escena de forma fácil y cómoda. Por ejemplo una interfaz con Qt con una vista OpenGL, que permita previsualizar la escena, cargar modelos tridimensionales y colocar las luces y la cámara facilitaría mucho el hecho de configurar escenas y crear nuevos renderizados.
+Por último y aunque no era el objetivo de este proyecto, una mejora interesante sería implementar una interfaz de usuario que permitiese configurar la escena de forma fácil y cómoda. Por ejemplo una interfaz con Qt con una vista OpenGL, que permita previsualizar la escena, cargar modelos tridimensionales y colocar las luces y la cámara facilitaría mucho el hecho de configurar escenas y crear nuevos renderizados.
 
 \clearpage
 
@@ -51,7 +72,7 @@ Durante el desarrollo de este proyecto hemos podido comprobar que las ganancias 
 
 \medskip
 
-Además, considerando que los experimentos se han realizado con una tarjeta gráfica de ordenador portátil y que la implementación es muy optimizable, creemos que en pocos años sera habitual disponer de software capaz de renderizar escenas con iluminación global en tiempo real.
+Además, considerando que los experimentos se han realizado con una tarjeta gráfica de ordenador portátil y que la implementación es muy optimizable, creemos que en pocos años será habitual disponer de software capaz de renderizar escenas con iluminación global en tiempo real.
 
 \nocite{Ashikhmin2000}
 \nocite{Cook1984}
