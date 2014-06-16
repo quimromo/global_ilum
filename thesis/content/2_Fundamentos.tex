@@ -20,28 +20,28 @@ E = \frac{d\Phi}{dA}
 \clearpage
 
 \subsection{Ángulo sólido}
-El angulo sólido no es una unidad radiométrica en si mismo, pero es un concepto geométrico necesario para poder explicar otros conceptos radiométricos, además de otros apartados del presente trabajo.
+El ángulo sólido no es una unidad radiométrica en sí mismo, pero es un concepto geométrico necesario para poder explicar otros conceptos radiométricos, además de otros apartados del presente trabajo.
 
-Podemos entender el concepto de angulo sólido como la extension del angulo a las tres dimensiones.
+Podemos entender el concepto de ángulo sólido como la extensión del ángulo a las tres dimensiones.
 \begin{figure}[h]
 \centering
 \includegraphics[width=2in]{Solid_Angle.png}
-\caption{Definición de angulo sólido \cite{Haade}}
+\caption{Definición de ángulo sólido \cite{Haade}}
 \end{figure}
 
-El angulo sólido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas estereorradianes $[sr]$.
+El ángulo sólido se mide como el área proyectada sobre una esfera de radio unitario. Sus unidades son adimensionales y son llamadas estereorradianes $[sr]$.
 \begin{equation}
 \Omega = \frac{A}{r^2}
 \end{equation}
 
 
-Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el angulo sólido diferencial como:
+Usando coordenadas esféricas $\Theta = (\phi , \theta )$ podemos definir el ángulo sólido diferencial como:
 
 \begin{equation}
 d \omega _ \Theta = \sin \theta d \theta d \phi
 \end{equation}
 
-Informalmente resulta sencillo entender el angulo sólido si pensamos en \emph{cuan grande se ve un objeto}. Supongamos una superficie perpendicular a la dirección de visión del observador: si este objeto esta muy cerca, diremos que subtiende un angulo sólido mayor que la misma superficie a una mayor distancia en la misma dirección.
+Informalmente resulta sencillo entender el ángulo sólido si  pensamos en \emph{cuán grande se ve un objeto}. Supongamos una superficie perpendicular a la dirección de visión del observador: si  este objeto está muy cerca, diremos que subtiende un ángulo sólido mayor que la misma superficie a una mayor distancia en la misma dirección.
 
 \clearpage
 
@@ -49,7 +49,7 @@ Informalmente resulta sencillo entender el angulo sólido si pensamos en \emph{c
 
 La radiancia, también llamada intensidad por algunos autores, es probablemente la unidad radiométrica más importante en lo que concierne al presente trabajo, y a muchos de los algoritmos de iluminación global, ya que su valor es invariante a lo largo de la longitud de un rayo.
 
-Esta unidad mide la irradiancia por unidad de angulo sólido.
+Esta unidad mide la irradiancia por unidad de ángulo sólido.
 
 \begin{equation}
 L = \frac{dE}{d\omega} = \frac{d^2\Phi}{d\omega dA\cos \theta} 
@@ -68,7 +68,7 @@ f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} = \frac{dL(x \to v)}{L(x \gets l) \
 
 Donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz, y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
 
-La BRDF solo esta definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
+La BRDF solo está definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
 
 \begin{figure}[h]
 \centering
@@ -98,7 +98,7 @@ En primer lugar debe cumplir la ley de conservación de la energía. En el caso 
 En términos informales esta ecuación significa que la integral de toda la luz reflejada debido a un rayo de luz entrante nunca podrá ser superior a la luz entrante por ese rayo.
 
 \medskip
-Además también debe cumplir el \emph{principio de reciprocidad de Helmholtz}, esto significa que si intercambiamos los vectores $l$ y $v$, su valor se mantiene. Este hecho cobra sentido si pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vectores $v$ y $l$ el ángulo entre ellos sigue siendo el mismo.
+Además también debe cumplir el \emph{principio de reciprocidad de Helmholtz}, esto significa que si  intercambiamos los vectores $l$ y $v$, su valor se mantiene. Este hecho cobra sentido si  pensamos que la BRDF es una característica intrínseca de cada material y que al intercambiar los vectores $v$ y $l$ el ángulo entre ellos sigue siendo el mismo.
 
 \begin{equation}
 f(x, l, v) = f(x, v, l)
@@ -106,7 +106,7 @@ f(x, l, v) = f(x, v, l)
 
 \subsection{Isotropía y anisotropía de la BRDF}
 
-Una BRDF isotrópica es aquella en la que su valor se mantendrá constante si aplicamos la misma rotación a $v$ y a $l$ alrededor de la normal de la superficie. Por el contrario una BRDF anisotrópica cambiará su valor dependido de la rotación de $v$ y $l$ alrededor de la normal.
+Una BRDF isotrópica es aquella en la que su valor se mantendrá constante si  aplicamos la misma rotación a $v$ y a $l$ alrededor de la normal de la superficie. Por el contrario una BRDF anisotrópica cambiará su valor dependido de la rotación de $v$ y $l$ alrededor de la normal.
 
 \clearpage
 
@@ -120,7 +120,7 @@ f(x, l, v) = \frac{k_d}{\pi} + k_s \frac{n + 2}{2 \pi} \cos^n\alpha
 \end{equation}
 
 donde $\alpha$ es el ángulo entre la dirección de reflexión especular perfecta y $l$.
-En esta forma, la función esta normalizada para conservar la energía, pero además para que esto sea cierto se debe cumplir $k_d + k_s \leq 1$.
+En esta forma, la función está normalizada para conservar la energía, pero además para que esto sea cierto se debe cumplir $k_d + k_s \leq 1$.
 
 
 
@@ -128,7 +128,7 @@ En esta forma, la función esta normalizada para conservar la energía, pero ade
 
 \section{Ecuación de renderizado}
 
-La ecuación de renderizado fue desarrollada en los años 80 simultaneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
+La ecuación de renderizado fue desarrollada en los años 80 simultáneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
 
 \medskip
 Existen varias versiones de esta ecuación, según el autor que la use, que en general se pueden clasificar en dos tipos: las que integran sobre la hemiesfera, que se corresponde con la ecuación propuesta por Immel y las que integran sobre la unión de las superficies de la escena, que es la version propuesta por Kajiya.
@@ -152,7 +152,7 @@ El problema es que no parece factible encontrar una solución analítica de esta
 
 \section{El método de Montecarlo}
 
-El método de Montecarlo se trata de un método de integración numérico para integrales definidas sobre un dominio de dimension arbitraria, del tipo:
+El método de Montecarlo se trata de un método de integración numérico para integrales definidas sobre un dominio de dimensión arbitraria, del tipo:
 \begin{equation}
 I = \int_D f(x)dx , D \subseteq \mathbb{R}^m
 \end{equation}
@@ -186,7 +186,7 @@ El error en una estimación de este tipo se reduce a medida que $N$ crece.
 
 \subsection{Muestreo de importancia}
     
-Otra forma de reducir el error a parte de tomar más muestras es tomarlas de forma más inteligente. Anteriormente hemos supuesto que tomamos las muestras de una distribución uniforme sobre el dominio, pero el método de Montecarlo no impone ninguna limitación en este aspecto. Esto implica que podemos tomar las muestras de otro tipo de distribuciones, que sean más apropiadas para cada caso. Por ejemplo tomando más muestras en aquellas partes del dominio de integración que sean más interesantes o importantes para nuestros propósitos.
+Otra forma de reducir el error aparte de tomar más muestras es tomarlas de forma más inteligente. Anteriormente hemos supuesto que tomamos las muestras de una distribución uniforme sobre el dominio, pero el método de Montecarlo no impone ninguna limitación en este aspecto. Esto implica que podemos tomar las muestras de otro tipo de distribuciones, que sean más apropiadas para cada caso. Por ejemplo tomando más muestras en aquellas partes del dominio de integración que sean más interesantes o importantes para nuestros propósitos.
 
 \medskip
 
@@ -211,17 +211,17 @@ Aunque algunos de los conceptos explicados aquí son aplicables a otros modelos,
 
 \medskip
 
-El problema que nos ocupa se nos presenta cuando tenemos que estimar la luz que llega a un punto del espacio. Una aproximación \emph{naive}, sin usar muestreo de importancia, seria muestrear uniformemente direcciones en la hemiesfera y evaluar la BRDF para cada dirección. Esto puede funcionar bien cuando se trata de materiales puramente difusos, sin componente especular o con un lóbulo especular muy abierto. Por el contrario en el caso de encontrarnos con una superficie altamente especular, como por ejemplo un metal, la cantidad de muestras necesarias para obtener una estimación decente seria desorbitada, ya que la probabilidad de elegir una dirección dentro del lóbulo especular seria muy pequeña.
+El problema que nos ocupa se nos presenta cuando tenemos que estimar la luz que llega a un punto del espacio. Una aproximación \emph{naive}, sin usar muestreo de importancia, sería muestrear uniformemente direcciones en la hemiesfera y evaluar la BRDF para cada dirección. Esto puede funcionar bien cuando se trata de materiales puramente difusos, sin componente especular o con un lóbulo especular muy abierto. Por el contrario en el caso de encontrarnos con una superficie altamente especular, como por ejemplo un metal, la cantidad de muestras necesarias para obtener una estimación decente sería desorbitada, ya que la probabilidad de elegir una dirección dentro del lóbulo especular sería muy pequeña.
 
 \medskip
-Cuando nos encontremos en la tesitura de tener que muestrear proporcionalmente a la BRDF, lo primero que habrá que tener en cuenta será decidir si muestrear la parte difusa o la parte especular de la BRDF, de forma proporcional a las características del material en cuestión. Es decir que para un rayo, la probabilidad de muestrear el lóbulo difuso sera de $k_d$, la probabilidad de muestrear el lóbulo especular sera $k_s$ y la probabilidad de ser absorbido sera $1 - k_d - k_s$.
+Cuando nos encontremos en la tesitura de tener que muestrear proporcionalmente a la BRDF, lo primero que habrá que tener en cuenta será decidir si  muestrear la parte difusa o la parte especular de la BRDF, de forma proporcional a las características del material en cuestión. Es decir que para un rayo, la probabilidad de muestrear el lóbulo difuso será de $k_d$, la probabilidad de muestrear el lóbulo especular será $k_s$ y la probabilidad de ser absorbido será $1 - k_d - k_s$.
 
 \medskip
 
 Para ello generaremos un número aleatorio $0 \leq r \leq 1$ y si
 $r \leq k_s$ muestrearemos la parte especular,
-si $k_s < r \leq k_s + k_d$ muestrearemos la parte difusa
-y si $k_s + k_d < r$ el rayo sera absorbido por el material.
+si  $k_s < r \leq k_s + k_d$ muestrearemos la parte difusa
+y si  $k_s + k_d < r$ el rayo será absorbido por el material.
 
 \medskip
 
@@ -277,19 +277,19 @@ El vector resultante de muestrear esta pdf, en coordenadas esféricas:
 En ambos casos se prosigue trazando el rayo con la dirección obtenida y se calcula la radiancia reflejada en la dirección $v$ en función de la radiancia entrante $L(x \gets l)$ del siguiente modo:
 \medskip
 
-si estamos evaluando el factor difuso
+si  estamos evaluando el factor difuso
 \begin{equation}
 L(x \to v) = \frac{L(x \gets l)k_d(n \cdot l)}{q_1 pdf_{diff}(l)}
 \end{equation}
 
-si evaluamos el factor especular
+si  evaluamos el factor especular
 
 \begin{equation}
 L(x \to v) = \frac{L(x \gets l)k_s(n \cdot l)(R \cdot l)^n}{q_2 pdf_{spec}(l)}
 \end{equation}
 siendo $R$ el vector $v$ reflejado respecto a la normal.
 
-si el rayo es absorbido, la contribución es $0$.
+si  el rayo es absorbido, la contribución es $0$.
 
 
 
@@ -299,11 +299,11 @@ si el rayo es absorbido, la contribución es $0$.
 \subsection{Muestreo del ángulo sólido subtendido}
 \label{sample_solid}
 
-Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear una fuente de luz será necesario integrar el ángulo sólido subtendido por dicha fuente de luz. A priori, no sabemos si la fuente de luz estará ocluida, pero si que podemos saber que ángulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega. Por lo tanto, la idea será lanzar solo rayos dentro de este ángulo sólido para que vayan dirigidos hacia la fuente de luz.
+Como en este trabajo estamos calculando la integral de la luz dispersada integrando la hemiesfera, cuando tengamos que muestrear una fuente de luz será necesario integrar el ángulo sólido subtendido por dicha fuente de luz. A priori, no sabemos si  la fuente de luz estará ocluida, pero sí que podemos saber que ángulo subtiende con respecto al punto sobre el que estamos calculando la luz que llega. Por lo tanto, la idea será lanzar solo rayos dentro de este ángulo sólido para que vayan dirigidos hacia la fuente de luz.
 
 \medskip
 
-Para proceder de este modo sera necesario calcular el ángulo sólido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos utilizado luces esféricas, pero es posible aplicar un método similar para luces poligonales.
+Para proceder de este modo será necesario calcular el ángulo sólido y definir una estrategia de muestreo para cada tipo de luz presente. En este trabajo hemos utilizado luces esféricas, pero es posible aplicar un método similar para luces poligonales.
 
 \subsubsection{Esfera}
 

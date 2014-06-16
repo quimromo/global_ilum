@@ -197,7 +197,7 @@ void CPathtracer::prepare(){
 
 
 	m_context->setPrintEnabled(true);
-	m_context->setStackSize(4096);
+	m_context->setStackSize(8192);
 	
 	optix::Group obj_models_group = m_context->createGroup();
 	obj_models_group->setAcceleration(m_context->createAcceleration("Sbvh", "Bvh"));
@@ -451,15 +451,15 @@ int main(int argc, char* argv[]){
 	pt.setRenderSize(width, height);
 	pt.setSqrtSamplesPerPixel(sqrtspp);
 	pt.setBlockSize(300u);
-	pt.setMaxDepth(7);
+	pt.setMaxDepth(10);
 	
 	/*
 	pt.setCamera(TCamera(optix::make_float3(8.0, 9.0, 1.0), optix::make_float3(7.0, 9.0, 0.5), 60.0f));
 	pt.addObjModel(TObjModel("assets/dabrovic-sponza/sponza.obj"));
 	pt.addLight(TSphereLight(optix::make_float3(2.0f, 2.0f, 2.0f), optix::make_float3(0.0f, 5.0f, 0.0f), 1.0f));
 	*/
-	loadSceneFromXML(pt, "assets/scenes/sibenik_scene.xml");
-	//loadSceneFromXML(pt, "assets/scenes/crytek_sponza_scene.xml");
+	//loadSceneFromXML(pt, "assets/scenes/sibenik_scene.xml");
+	loadSceneFromXML(pt, "assets/scenes/crytek_sponza_scene3.xml");
 	//loadSceneFromXML(pt, "assets/scenes/sibenik_scene2.xml");
 	//pt.setSkyDomeEmission(optix::make_float3(2.0, 2.0, 2.0));
 	//pt.enableSkyDome();

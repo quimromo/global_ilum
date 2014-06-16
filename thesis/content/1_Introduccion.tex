@@ -6,11 +6,11 @@ En el entorno de la imagen generada por computador siempre ha sido un reto trata
 
 \medskip
 
-Estos algoritmos, por lo general, suelen tener una complejidad computacional muy elevada y el tiempo de cómputo necesario para obtener un resultado satisfactorio en escenas complejas era un factor limitador en su aplicación práctica. Por ello las aplicaciones que hacen uso de gráficos 3D en tiempo real típicamente se centran en la iluminación local o directa de los objetos de la escena y simulan la iluminación indirecta mediante técnicas que aun sin tener un fundamento físico ofrecen una mayor credibilidad para el ojo humano. Estas técnicas suelen ser algoritmos de postprocesado que se aplican en espacio de pantalla, por ejemplo \emph{ambient occlusion} o \emph{directional occlusion}. 
+Estos algoritmos, por lo general, suelen tener una complejidad computacional muy elevada y el tiempo de cómputo necesario para obtener un resultado satisfactorio en escenas complejas era un factor limitador en su aplicación práctica. Por ello las aplicaciones que hacen uso de gráficos 3D en tiempo real típicamente se centran en la iluminación local o directa de los objetos de la escena y simulan la iluminación indirecta mediante técnicas que aún sin tener un fundamento físico ofrecen una mayor credibilidad para el ojo humano. Estas técnicas suelen ser algoritmos de postprocesado que se aplican en espacio de pantalla, por ejemplo \emph{ambient occlusion} o \emph{directional occlusion}. 
 
 \medskip
 
-Sin embargo en los últimos años se han realizado grandes avances en las arquitecturas de las unidades de procesamiento de gráficos (GPUs), en especial la gran capacidad de cómputo en paralelo debido al elevado número de microprocesadores que forman estos dispositivos. Con tal de aprovechar estos avances en el hardware los fabricantes de GPU han desarrollado librerías de computo genérico (OpenCL, CUDA), que ofrecen gran libertad al programador para implementar sus propios algoritmos.
+Sin embargo en los últimos años se han realizado grandes avances en las arquitecturas de las unidades de procesamiento de gráficos (GPUs), en especial la gran capacidad de cómputo en paralelo debido al elevado número de microprocesadores que forman estos dispositivos. Con tal de aprovechar estos avances en el hardware los fabricantes de GPU han desarrollado librerías de cómputo genérico (OpenCL, CUDA), que ofrecen gran libertad al programador para implementar sus propios algoritmos.
 
 \medskip
 
@@ -44,7 +44,7 @@ Este algoritmo trata de resolver el problema de la iluminación indirecta entre 
 
 \medskip
 
-El funcionamiento del algoritmo, en lineas generales, se basa en dividir la escena en pequeñas unidades de área, llamadas parches, que deberían funcionar como diferenciales de área. Luego a través de una serie de iteraciones se intenta balancear el flujo de luz emitido, reflejado y absorbido entre todos estos parches.
+El funcionamiento del algoritmo, en líneas generales, se basa en dividir la escena en pequeñas unidades de área, llamadas parches, que deberían funcionar como diferenciales de área. Luego a través de una serie de iteraciones se intenta balancear el flujo de luz emitido, reflejado y absorbido entre todos estos parches.
 
 \clearpage
 
@@ -69,23 +69,23 @@ La principal mejora de este algoritmo respecto a su antecesor, es que es capaz d
 
 \subsection{Metropolis light transport}
 
-Siguiendo en la linea de los dos algoritmos anteriores, otra notable mejora llego con el llamado Metropolis light transport \cite{Veach1997}. Este algoritmo parte de la base del path tracing bidireccional, pero en vez de confiar en crear muchos paths hasta converger a una solución aceptable, utiliza un método conocido como algoritmo de Metropolis-Hastings para generar varias mutaciones del mismo path. 
+Siguiendo en la línea de los dos algoritmos anteriores, otra notable mejora llego con el llamado Metropolis light transport \cite{Veach1997}. Este algoritmo parte de la base del path tracing bidireccional, pero en vez de confiar en crear muchos paths hasta converger a una solución aceptable, utiliza un método conocido como algoritmo de Metropolis-Hastings para generar varias mutaciones del mismo path. 
 
 \medskip
-Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales, que normalmente serian muy costosas de renderizar con los algoritmos que hemos comentado anteriormente. Por ejemplo cáusticas, intereflexiones especulares-difusas, etc.
+Este algoritmo desata todo su potencial cuando se trata de renderizar interacciones complejas entre materiales, que normalmente serían muy costosas de renderizar con los algoritmos que hemos comentado anteriormente. Por ejemplo cáusticas, intereflexiones especulares-difusas, etc.
 
 \clearpage
 
 \subsection{Photon mapping}
 
-Todos los algoritmos que estamos viendo tratan la luz como partículas y no como ondas, pero este algoritmo lo hace de un modo aun mas explicito.
-El algoritmo de Photon mapping \cite{Jensen1996} empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y según las propiedades (BRDF) del material si el fotón sera absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
+Todos los algoritmos que estamos viendo tratan la luz como partículas y no como ondas, pero este algoritmo lo hace de un modo aún mas explícito.
+El algoritmo de Photon mapping \cite{Jensen1996} empieza lanzando rayos (fotones) desde las fuentes de luz. Cuando estos fotones interseccionan con un objeto de la escena se decide aleatoriamente y según las propiedades (BRDF) del material si el fotón será absorbido, dispersado especularmente o dispersado difusamente. Las posiciones finales donde los fotones son absorbidos se guardan en un mapa (kd-tree) de fotones para la siguiente fase.
 
 \medskip
 La siguiente fase, llamada final gathering, realiza un ray tracing de la escena y en cada intersección consulta el mapa de fotones para ver la cantidad de luz que llega a ese punto.
 
 \medskip
-Este algoritmo sobresale entre todos los demás cuando se trata de renderizar cáusticas, pero en cambio, puede producir errores cuando se renderizan superficies difusas si el numero de fotones no es muy grande.
+Este algoritmo sobresale entre todos los demás cuando se trata de renderizar cáusticas, pero en cambio, puede producir errores cuando se renderizan superficies difusas si el número de fotones no es muy grande.
 
 
 \subsection{Instant radiosity}
@@ -104,34 +104,34 @@ Además del algoritmo de instant radiosity básico existen modificaciones del mi
 
 \section{Tecnologías involucradas}
 
-El propósito de esta sección es explicar las principales tecnologías utilizadas durante el desarrollo de este proyecto. Debido al alcance de este trabajo la mayoría de tecnologías que comentaremos en este apartado son tecnologías especificas de las GPU.
+El propósito de esta sección es explicar las principales tecnologías utilizadas durante el desarrollo de este proyecto. Debido al alcance de este trabajo la mayoría de tecnologías que comentaremos en este apartado son tecnologías específicas de las GPU.
 
 \subsection{Arquitectura de las GPU modernas}
 
-Las arquitecturas de GPU modernas siguen una paradigma conocido como SIMD (del inglés, Single Instruction Multiple Data), que consiste en la capacidad de un procesador de ejecutar la misma instrucción en paralelo sobre datos distintos. Es decir, que se ejecuta el mismo proceso en varias unidades de computo, pero los datos que trata cada unidad pueden ser distintos.
+Las arquitecturas de GPU modernas siguen un paradigma conocido como SIMD (del inglés, Single Instruction Multiple Data), que consiste en la capacidad de un procesador de ejecutar la misma instrucción en paralelo sobre datos distintos. Es decir, que se ejecuta el mismo proceso en varias unidades de cómputo, pero los datos que trata cada unidad pueden ser distintos.
 
 \subsection{Shaders}
 
-Los fabricantes de GPUs empezaron a explotar esta capacidad de computo en paralelo, ofreciendo a los programadores de gráficos la posibilidad de programar ciertos puntos del proceso de renderizado efectuado por las GPU, con los llamados shaders. Los shaders son pequeños programas que se ejecutan en la GPU y sirven para programar funcionalidades. Tradicionalmente existían dos tipos de shaders: los vertex shaders, que se ejecutaban para cada vértice de cada primitiva a pintar, y los pixel o fragment shaders que se ejecutaban para cada pixel rasterizado.
+Los fabricantes de GPUs empezaron a explotar esta capacidad de cómputo en paralelo, ofreciendo a los programadores de gráficos la posibilidad de programar ciertos puntos del proceso de renderizado efectuado por las GPU, con los llamados shaders. Los shaders son pequeños programas que se ejecutan en la GPU y sirven para programar funcionalidades. Tradicionalmente existían dos tipos de shaders: los vertex shaders, que se ejecutaban para cada vértice de cada primitiva a pintar, y los pixel o fragment shaders que se ejecutaban para cada pixel rasterizado.
 
 \medskip
 Según el paradigma SIMD, solo puede ejecutarse un único shader en cada GPU pero los datos pueden ser distintos: en el caso de los vertex shaders, por ejemplo, cada unidad de procesamiento tendrá acceso a las coordenadas geométricas de un vértice, las coordenadas de textura de ese vértice, etc. Es decir que un vertex shader ejecutara exactamente las mismas operaciones para cada vértice en paralelo. 
 
 \clearpage
 
-\subsection{Capacidad de computo genérico}
-La principal limitación de los shaders es que solo trabajan con datos relacionados con el renderizado de gráficos (coordenadas de vértices, coordenadas de textura, vectores normales, texturas, etc). Si un programador quería utilizar la capacidad de computo en paralelo de las GPU para problemas distintos al renderizado por rasterizado de gráficos, debía buscar la manera de codificar los datos del problema en forma de vértices y texturas, lo cual podía resultar tedioso o complicado.
+\subsection{Capacidad de cómputo genérico}
+La principal limitación de los shaders es que solo trabajan con datos relacionados con el renderizado de gráficos (coordenadas de vértices, coordenadas de textura, vectores normales, texturas, etc). Si un programador quería utilizar la capacidad de cómputo en paralelo de las GPU para problemas distintos al renderizado por rasterizado de gráficos, debía buscar la manera de codificar los datos del problema en forma de vértices y texturas, lo cual podía resultar tedioso o complicado.
 
 \medskip
-Debido a esta necesidad los fabricantes de GPU empezaron a buscar una forma de ampliar las capacidades de computo que ofrecían sus dispositivos y desarrollaron plataformas de programación genérica en GPUs. La primera de estas plataformas fue la desarrollada por Nvidia, con el nombre CUDA, para sus tarjetas gráficas. Posteriormente se desarrollo OpenCL, un estándar de computo en paralelo tanto para GPUs, como para CPUs, soportado por la mayoría de fabricantes de hardware.
+Debido a esta necesidad los fabricantes de GPU empezaron a buscar una forma de ampliar las capacidades de cómputo que ofrecían sus dispositivos y desarrollaron plataformas de programación genérica en GPUs. La primera de estas plataformas fue la desarrollada por Nvidia, con el nombre CUDA, para sus tarjetas gráficas. Posteriormente se desarrolló OpenCL, un estándar de cómputo en paralelo tanto para GPUs, como para CPUs, soportado por la mayoría de fabricantes de hardware.
 
 \subsection{CUDA}
 
-CUDA es la plataforma de computo genérico sobre GPU desarrollada por Nvidia para GPUs de Nvidia. El compilador nvcc (NVidia C Compiler) permite tanto compilar programas con una parte en el host (CPU) y otra parte en el device (la GPU), como compilar kernels, que se ejecutaran en la GPU.
+CUDA es la plataforma de cómputo genérico sobre GPU desarrollada por Nvidia para GPUs de Nvidia. El compilador nvcc (NVidia C Compiler) permite tanto compilar programas con una parte en el host (CPU) y otra parte en el device (la GPU), como compilar kernels, que se ejecutaran en la GPU.
 
 \subsection{OptiX}
 
-OptiX es una librería de ray tracing sobre CUDA desarrolada por Nvidia. Optix esta diseñado con la idea de ofrecer un framework para ray tracing lo más genérico y programable posible, tratando de no limitar las posibilidades del programador.
+OptiX es una librería de ray tracing sobre CUDA desarrolada por Nvidia. Optix está diseñado con la idea de ofrecer un framework para ray tracing lo más genérico y programable posible, tratando de no limitar las posibilidades del programador.
 
 \clearpage
 
@@ -149,7 +149,7 @@ Una vez decidido el algoritmo, otro objetivo parcial necesario para alcanzar el 
 
 \medskip
 
-Finalmente sera necesario plasmar los conocimientos teóricos adquiridos en una implementación de un renderizador con iluminación global. 
+Finalmente será necesario plasmar los conocimientos teóricos adquiridos en una implementación de un renderizador con iluminación global. 
 
 
 
