@@ -28,7 +28,7 @@ Es una estructura que representa un modelo 3D en formato .obj. Se construye pas�
 
 \subsection{Clase CPathtracer}
 
-Este es el tipo de datos más relevante de nuestra interfaz. Todos los datos relativos a la escena y al renderizado son finalmente encapsulados en un objeto de este tipo. Una vez configurado, es el responsable de cargar los programás de OptiX y construir el \emph{Context} de OptiX y controlar la ejecución del mismo.
+Este es el tipo de datos más relevante de nuestra interfaz. Todos los datos relativos a la escena y al renderizado son finalmente encapsulados en un objeto de este tipo. Una vez configurado, es el responsable de cargar los programas de OptiX y construir el \emph{Context} de OptiX y controlar la ejecución del mismo.
 
 \subsection{Uso de la interfaz de programación}
 
@@ -169,7 +169,7 @@ float3 ray_origin = eye;
 float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
 \end{lstlisting}
 
-El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es él índice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
+El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es el índice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
 
 \medskip
 
@@ -194,7 +194,7 @@ En primer lugar decidimos aleatoriamente si muestrear la parte difusa o la parte
 
 \medskip
 
-Generamos un un número aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestreamos la parte especular, si $p_{spec} < r \leq p_{spec} + p_{diff}$ la parte difusa, en caso contrario el rayo es absorbido y terminamos la recursión del mismo.
+Generamos un número aleatorio $r$ en $[0,1]$ y si $r \leq p_{spec}$ muestreamos la parte especular, si $p_{spec} < r \leq p_{spec} + p_{diff}$ la parte difusa, en caso contrario el rayo es absorbido y terminamos la recursión del mismo.
 
 \medskip
 

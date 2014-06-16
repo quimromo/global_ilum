@@ -60,13 +60,13 @@ L = \frac{dE}{d\omega} = \frac{d^2\Phi}{d\omega dA\cos \theta}
 
 \section{BRDF}
 
-La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por \cite{Nicodemus1965} Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida, y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada.
+La función de distribución de reflectancia bidireccional (de ahora en adelante BRDF, por sus siglas en inglés), definida por primera vez por \nocite{Nicodemus1965} Nicodemus (1965), es un función que define la respuesta a la luz de una superficie opaca, tomando como parámetros dos vectores unitarios que definen las direcciones de entrada y salida de la luz. Más formalmente, la BRDF mide la relación entre la radiancia diferencial reflejada en la dirección de salida, y la irradiancia diferencial entrante en el ángulo sólido diferencial alrededor del vector de entrada.
 
 \begin{equation}
 f(x, l, v)=\frac{dL(x \to v)}{dE(x \gets l)} = \frac{dL(x \to v)}{L(x \gets l) \cos\theta d\omega_i} 
 \end{equation}
 
-Donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz, y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
+donde $l$ es el vector unitario que apunta en la dirección opuesta a la de entrada de la luz, y $v$ es el vector unitario que apunta en la dirección de salida de la luz.
 
 La BRDF solo está definida para vectores $l$ y $v$ tales que $n \cdot v > 0, n \cdot l > 0$, siendo $n$ la normal de la superficie.
 
@@ -131,7 +131,7 @@ En esta forma, la función está normalizada para conservar la energía, pero ad
 La ecuación de renderizado fue desarrollada en los años 80 simultáneamente y de forma independiente por distintos autores \cite{Kajiya1986, Immel1986}. Se trata de una ecuación integral que unifica y formaliza los distintos algoritmos de renderizado, ya que hasta ese momento no existía un marco de trabajo teórico común.
 
 \medskip
-Existen varias versiones de esta ecuación, según el autor que la use, que en general se pueden clasificar en dos tipos: las que integran sobre la hemiesfera, que se corresponde con la ecuación propuesta por Immel y las que integran sobre la unión de las superficies de la escena, que es la version propuesta por Kajiya.
+Existen varias versiones de esta ecuación, según el autor que la use, que en general se pueden clasificar en dos tipos: las que integran sobre la hemiesfera, que se corresponde con la ecuación propuesta por Immel y las que integran sobre la unión de las superficies de la escena, que es la versión propuesta por Kajiya.
 \medskip
 
 Consideremos la ecuación \ref{eq:radiance_integral}  y consideremos que además de dispersar luz una superficie también puede emitir luz, siendo $L_e$ la radiancia de la luz emitida, entonces tenemos la ecuación de renderizado.
