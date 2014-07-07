@@ -67,12 +67,14 @@ class CPathtracer{
 
 	unsigned blocks_x;
 	unsigned blocks_y;
+	
 
 	void prepareLights();
 	void prepareObjModels();
 
 public:
 
+	double optix_time;
 	//CPathtracer();
 	void setSkyDomeEmission(optix::float3 sky_dome_emission);
 	void disableSkyDome();

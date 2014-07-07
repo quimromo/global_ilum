@@ -9,6 +9,7 @@
 #include "ObjLoader.h"
 #include <SDL/SDL.h>
 #include <gl\GL.h>
+#include <ctime>
 
 #include <direct.h>
 #include "pugixml.hpp"
@@ -55,6 +56,7 @@ void CPathtracer::renderNextSample(){
 				m_context["output_buffer"]->getBuffer()->unmap();
 				buffer_mapped = false;
 			}
+			double start_t, end_t;
 			for(unsigned block_y = 0; block_y < blocks_y; ++block_y){
 					
 				unsigned block_size_y = height/blocks_y;
@@ -66,12 +68,6 @@ void CPathtracer::renderNextSample(){
 					unsigned block_size_x = width/blocks_x;
 					unsigned offset_x = block_size_x * block_x;  
 					if (block_x == blocks_x - 1)block_size_x += width%blocks_x;	
-					/*
-					std::cout << "OFFSET:" << offset_x << " " << offset_y << std::endl;
-					std::cout << "BLOCK_SIZE:" << block_size_x << " " << block_size_y << std::endl;
-					*/
-					float rnd1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					float rnd2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 						
 
 					m_context["offset_x"]->setUint(offset_x);
@@ -80,7 +76,11 @@ void CPathtracer::renderNextSample(){
 				
 					//m_context->validate();
 					//m_context->compile();
+
+					start_t = SDL_GetTicks();
 					m_context->launch( 0, block_size_x, block_size_y );
+					end_t = SDL_GetTicks();
+					optix_time += end_t - start_t;
 
 					SDL_Event event;
 					SDL_PollEvent(&event);
@@ -138,6 +138,7 @@ void CPathtracer::prepareObjModels(){
 
 void CPathtracer::prepare(){
 
+	optix_time = 0.0;
 	blocks_x = width / approx_block_size;
 	blocks_y = height / approx_block_size;
 	max_block_size_x = width / blocks_x + width % blocks_x;
@@ -233,7 +234,7 @@ void CPathtracer::prepare(){
 		
 		if( ObjLoader::isMyFile( filename.c_str() ) ) {
 
-			ObjLoader loader( filename.c_str(), m_context, group, diffuse, true, "Sbvh", "Bvh", "refine", false);
+			ObjLoader loader( filename.c_str(), m_context, group, diffuse, true, "Sbvh", "Bvh", "0", false);
 			loader.setBboxProgram(mesh_bounds);
 			loader.setIntersectProgram(mesh_isect);
 			loader.load();
@@ -445,13 +446,13 @@ int main(int argc, char* argv[]){
 	SDL_GLContext maincontext;
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	maincontext = SDL_GL_CreateContext(window);
-	unsigned int sqrtspp = 30;
+	unsigned int sqrtspp = 10;
 	CPathtracer pt;
 
 	pt.setRenderSize(width, height);
 	pt.setSqrtSamplesPerPixel(sqrtspp);
-	pt.setBlockSize(300u);
-	pt.setMaxDepth(10);
+	pt.setBlockSize(100u);
+	pt.setMaxDepth(7);
 	
 	/*
 	pt.setCamera(TCamera(optix::make_float3(8.0, 9.0, 1.0), optix::make_float3(7.0, 9.0, 0.5), 60.0f));
@@ -459,20 +460,27 @@ int main(int argc, char* argv[]){
 	pt.addLight(TSphereLight(optix::make_float3(2.0f, 2.0f, 2.0f), optix::make_float3(0.0f, 5.0f, 0.0f), 1.0f));
 	*/
 	//loadSceneFromXML(pt, "assets/scenes/sibenik_scene.xml");
-	loadSceneFromXML(pt, "assets/scenes/crytek_sponza_scene3.xml");
+	if(argc != 2)
+		loadSceneFromXML(pt, "assets/scenes/test_scene.xml");
+	else
+		loadSceneFromXML(pt, argv[1]);
 	//loadSceneFromXML(pt, "assets/scenes/sibenik_scene2.xml");
 	//pt.setSkyDomeEmission(optix::make_float3(2.0, 2.0, 2.0));
 	//pt.enableSkyDome();
+	
 	pt.prepare();
-
+	std::cout << "STARTING" << std::endl;
+	double time_start = SDL_GetTicks();//time(0);
 	int current = 0;
+	
+	
 	while(pt.samplesToDo() > 0){
 		pt.renderNextSample();
 		float* buf = pt.getOutputBuffer();
 		glClearColor ( 0.0, 1.0, 0.0, 1.0 );
 		glClear ( GL_COLOR_BUFFER_BIT );
 						
-		glDrawPixels(width, height, GL_RGB, GL_FLOAT, buf /*&render_image[0]*/);
+		glDrawPixels(width, height, GL_RGB, GL_FLOAT, buf);
 		SDL_GL_SwapWindow(window);		
 				
 		std::cout << static_cast<float>((++current) * 100) / static_cast<float>(sqrtspp * sqrtspp);
@@ -480,6 +488,17 @@ int main(int argc, char* argv[]){
 		pt.releaseBuffer();
 
 	}
+	
+
+
+	double time_end = SDL_GetTicks();
+
+	double total_time = (time_end - time_start) * 0.001;
+	double optix_time = pt.optix_time * 0.001;
+	double cpu_time = total_time - optix_time;
+	std::cout << "TOTAL RENDER TIME: " <<  total_time<< " seconds." << std::endl;
+	std::cout << "OPTIX CONTEXT TIME: " <<  optix_time<< " seconds." << std::endl;
+	std::cout << "CPU TIME: " <<  cpu_time<< " seconds." << std::endl;
 
 	std::stringstream ss;
 	ss << "render_" << currentDateTime() << "_" << sqrtspp * sqrtspp << "spp.tga"; 

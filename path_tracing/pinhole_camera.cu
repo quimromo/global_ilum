@@ -51,6 +51,7 @@ rtBuffer<float3, 1>              output_buffer;
 rtBuffer<float3, 1>              cumulated_buffer;
 rtDeclareVariable(rtObject,      top_object, , );
 rtDeclareVariable(unsigned int,  radiance_ray_type, , );
+//rtDeclareVaraible(unsigned int,  seed, , );
 
 rtDeclareVariable(uint2, launch_index, rtLaunchIndex, );
 rtDeclareVariable(uint2, launch_dim,   rtLaunchDim, );
@@ -85,7 +86,8 @@ RT_PROGRAM void m_pinhole_camera()
   prd.contribution = make_float3(1.0f);
   prd.importance = 1.f;
   prd.depth = 0;
-  prd.seed = tea<32>((launch_index.x + offset_x) * (launch_index.y + offset_y) + (int)clock(), currentSample + (int) clock());  
+  prd.seed = tea<8>((launch_index.x + offset_x) * (launch_index.y + offset_y) + (int)10000*clock(), currentSample + (int) 10000*clock());  
+  //prd.seed = seed;
   rtTrace(top_object, ray, prd);
 
 #ifdef TIME_VIEW
@@ -110,9 +112,9 @@ RT_PROGRAM void m_pinhole_camera()
   cumulated_buffer[buff_idx] += make_float3( prd.result.z, prd.result.y, prd.result.x );
 	
   float3 render_color = cumulated_buffer[buff_idx] / (currentSample + 1u);
-  output_buffer[buff_idx] = make_float3 (	__saturatef( powf( render_color.z, 1.0f/2.0f) ),
-											__saturatef( powf( render_color.y, 1.0f/2.0f) ),
-											__saturatef( powf( render_color.x, 1.0f/2.0f) )
+  output_buffer[buff_idx] = make_float3 (	__saturatef( render_color.z ),
+											__saturatef( render_color.y ),
+											__saturatef( render_color.x )
 										);
   /*
   output_buffer[launch_index] = make_float3 (	__saturatef(prd.result.z),

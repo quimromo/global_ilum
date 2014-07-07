@@ -30,7 +30,7 @@ Es una estructura que representa un modelo 3D en formato .obj. Se construye pas�
 
 Este es el tipo de datos más relevante de nuestra interfaz. Todos los datos relativos a la escena y al renderizado son finalmente encapsulados en un objeto de este tipo. Una vez configurado, es el responsable de cargar los programas de OptiX y construir el \emph{Context} de OptiX y controlar la ejecución del mismo.
 
-\subsection{Uso de la interfaz de programación}
+\subsection{Interfaz de programación}
 
 Para explicar el funcionamiento de la interfaz lo haremos mediante un sencillo ejemplo que contiene las clases y métodos principales de la interfaz.
 
@@ -121,59 +121,47 @@ La solución que encontramos fue dividir la imagen en bloques de menor tamaño y
 
 \clearpage
 
+\section{Algoritmo implementado}
+
+En esta sección veremos el flujo de ejecución del algoritmo de pathtracing que hemos implementado. Tal como hemos visto en capitulos anteriores el algoritmo de pathtracing se basa en estimar la cantidad de luz captada por cada pixel de la imagen, tomando varias muestras y sumando la contribución de cada muestra.
+
+\medskip
+
+Con tal de reducir el numero de transacciones de memoria entre el host y el device creamos un buffer de salida en este ultimo donde se ira acumulando el valor de las muestras tomadas. Dicho buffer se mantiene en la memoria del device entre llamadas sucesivas al kernel.
+
+\medskip
+
+En la figura \ref{fig:algorithm} puede verse el diagrama de flujo para el trazado de cada path para obtener una estimación de la luz captada por el sensor en el pixel correspondiente.
+
+\medskip
+
+Tal como puede verse en el diagrama se trata de un algoritmo recursivo que consiste en hacer rebotar un rayo por la escena, obteniendo la dirección de rebote probabilísticamente según las propiedades del material. Este proceso se efectua hasta que el rayo es absorbido por un material, el rayo intersecciona con una fuente de luz o bien llegamos a la profundidad de recursión máxima especificada.
+
+\begin{figure}
+\label{fig:algorithm}
+\centering
+\includegraphics[height=8in]{algorithm.png}
+\caption{Diagrama de flujo del algoritmo}
+\vspace*{0.5in}
+\end{figure}
+
+\clearpage
+
 \section{Cámara}
 
 \subsection{Host}
 
-En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vectores de la base ortonormal del sistema de coordenadas de cámara (front, left, up) y la relación (viewd) entre el vector front y el vector up en función del ángulo de visión fov.
-
-\begin{lstlisting}
-TCamera::TCamera(optix::float3 aposition, optix::float3 atarget, float afov)
-{
-	is_ok = false;
-	if(afov <= 0.0f || afov >= 179.0f) return;
-
-	position = aposition;
-	target = atarget;
-	fov = afov;
-	viewd = 0.0f;
-
-	front = optix::normalize(target - position);
-	left = optix::normalize(optix::cross(optix::make_float3(0.0f, 1.0f, 0.0f), front));
-	up = optix::normalize(optix::cross(front, left));
-
-	viewd = 1.0 / tanf( fov * 0.5f * DEG2RAD);
-	is_ok = true;		
-}
-\end{lstlisting}
-
-\clearpage
+En el host precalculamos los datos de la cámara que serán constantes durante la ejecución: los vectores de la base ortonormal del sistema de coordenadas de cámara (front, left, up) y la relación entre el vector front y el vector up en función del ángulo de campo de visión.
 
 \subsection{Device}
 
 En el device tenemos un programa encargado de generar los rayos primarios que se lanzaran desde la cámara, para ello se le pasan desde el host una serie de parámetros necesarios para lanzar el rayo correcto.
 
-\begin{lstlisting}
-float2 offset = make_float2(offset_x, offset_y);
-float2 startSample = make_float2(launch_index) + offset 
-	+ make_float2(
-	(float)(currentSample%sqrtspp) * (1.0f/(float)sqrtspp),
-	(float)(currentSample/sqrtspp) * (1.0f/(float)sqrtspp)
-);
-
-float2 centerSample = make_float2(1.0f/float(2 * sqrtspp));
-float2 d = (startSample + centerSample) / make_float2(screen_dim.x, screen_dim.y) * 2.f - 1.f;
-
-d.x *= aspect_ratio;
-float3 ray_origin = eye;
-float3 ray_direction = normalize(d.x*U + d.y*V + W*viewd);
-\end{lstlisting}
-
-El offset son las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el launch\_index es el índice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
+El programa toma un offset con las coordenadas absolutas en espacio de imagen del pixel top-left del bloque que estamos pintando y el índice del CUDA thread actual que se corresponde con las coordenadas relativas al bloque actual del pixel que estamos pintando. Usamos estas variables para calcular las coordenadas top-left del pixel que estamos pintando, en coordenadas absolutas de la imagen entera.
 
 \medskip
 
-Para que el muestreo múltiple de cada pixel proporcione antialiasing es necesario dividir el pixel en regiones y lanzar el rayo a través de la región que se corresponde con la muestra actual. Para calcular las coordenadas de la región actual lo hacemos a partir del parámetro currentSample y de la raíz cuadrada del total de muestras (la variable sqrtspp).
+Para que el muestreo múltiple de cada pixel proporcione antialiasing es necesario dividir el pixel en regiones y lanzar el rayo a través de la región que se corresponde con la muestra actual. Para calcular las coordenadas de la región actual lo hacemos a partir del indice de la muestra actual y de la raíz cuadrada del total de muestras.
 
 \medskip
 
@@ -181,7 +169,7 @@ Efectuados estos cálculos tenemos las coordenadas top-left absolutas de la regi
 
 \medskip
 
-En la variable d normalizamos esas coordenadas para obtener las coordenadas de pantalla correctas en el intervalo $[-1, 1]$. Corregimos la relación de aspecto de la imagen y calculamos la dirección del rayo resultante.
+Normalizamos esas coordenadas para obtener las coordenadas de pantalla correctas en el intervalo $[-1, 1]$. Corregimos la relación de aspecto de la imagen y calculamos la dirección del rayo resultante.
 
 \clearpage
 
@@ -203,33 +191,13 @@ Esta forma de terminar la recursión se conoce como ruleta rusa y es una técnic
 \subsection{Muestreo de la parte difusa de la BRDF}
 En el programa de closest hit, muestreamos la hemiesfera centrada en el punto de intersección para tener una estimación de la luz incidente.
 
-\begin{lstlisting}
-	unsigned int seed = prd_radiance.seed;
-	float r1 = rnd(seed);
-	float r2 = rnd(seed);
-	float3 p;
-	cosine_sample_hemisphere(r1, r2, p);
-	
-	float3 u, v;
-	createONB(ffnormal, u, v);
-	float3 rd = normalize(u * p.x + v * p.y + ffnormal * p.z);
-		
-	PerRayData_radiance diffuse_refl_prd;
-	diffuse_refl_prd.seed = seed;
-	diffuse_refl_prd.depth = prd_radiance.depth + 1;
-	diffuse_refl_prd.contribution *= Kd;
-	diffuse_refl_prd.is_light = false;
-	optix::Ray diffuse_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
-	rtTrace(top_object, diffuse_refl_ray, diffuse_refl_prd);
-	brdfLight = diffuse_refl_prd.result;
-	color += brdfLight * Kd / prob_diff;
-\end{lstlisting}
+\medskip
 
-Básicamente lo que hace es, en el caso de que no hayamos llegado a la profundidad de recursión máxima, muestrear un punto en la hemiesfera con densidad de coseno, generar una base ortonormal en función de la normal de la superficie y transformar el punto de la hemiesfera con esa base. Se traza un rayo recursivamente en la dirección obtenida y el color devuelto por ese rayo se multiplica por el color difuso de la superficie.
+Básicamente lo que hacemos es, en el caso de que no hayamos llegado a la profundidad de recursión máxima, muestrear un punto en la hemiesfera con densidad de coseno, generar una base ortonormal en función de la normal de la superficie y transformar el punto de la hemiesfera con esa base. Se traza un rayo recursivamente en la dirección obtenida y el color devuelto por ese rayo se multiplica por el color difuso de la superficie.
 
 \medskip
 
-Hay que hacer notar que en la instrucción \emph{color += brdfLight * Kd / prob\_diff;} no estamos multiplicando por el típico factor coseno de la normal y la luz. No lo hacemos porque al tomar la muestra con densidad coseno y dividir entre la densidad de probabilidad de esa muestra los factores coseno se anulan.
+Hay que hacer notar que cuando calculamos la contribución de la luz incidente $L(x \to v) = L(x \gets l) * k_d / p_{diff}$ no estamos multiplicando por el típico factor coseno de la normal y la luz. No lo hacemos porque al tomar la muestra con densidad coseno y dividir entre la densidad de probabilidad de esa muestra los factores coseno se anulan.
 Siguiendo con ese razonamiento y teniendo en cuenta que la densidad coseno es $\frac{cos(l,n)}{\pi}$ deberíamos multiplicar el resultado por $\pi$ para ser coherentes con la teoría, pero lo hemos quitado del cálculo porque hemos comprobado empíricamente que el resultado final es más satisfactorio sin ese factor, que en caso de incluirlo en el cálculo generaba imágenes excesivamente iluminadas y quemadas.
 
 \medskip
@@ -250,28 +218,10 @@ En las primeras fases de la implementación realizamos algunos renderizados con 
 
 En el caso de la parte especular usamos como densidad de probabilidad una potencia de coseno de forma que el exponente sea mayor cuanto más reflectante sea el material. Ese vector es posteriormente transformado con una base ortonormal orientada hacia la dirección de reflexión perfecta.
 
-\begin{lstlisting}
-	float3 eye = -ray.direction;
-	float3 perfect_specular = normalize(2.0 * ffnormal * dot(ffnormal, eye) - eye);
-	createONB(perfect_specular, u, v);
-	p = sample_specular2(phong_exp, r1, r2);
-	float3 rd = normalize(u * p.x + v * p.y + perfect_specular * p.z);
-	if(dot(rd, ffnormal) > 0.0f){
-		PerRayData_radiance specular_refl_prd;
-		specular_refl_prd.seed = seed;
-		specular_refl_prd.depth = prd_radiance.depth + 1;
-		specular_refl_prd.contribution *= Ks;
-		specular_refl_prd.is_light = false;
-		optix::Ray specular_refl_ray( hit, rd, radiance_ray_type, scene_epsilon );
-		rtTrace(top_object, specular_refl_ray, specular_refl_prd);
-		brdfLight = specular_refl_prd.result;
-				
-		color += ( brdfLight * Ks * (phong_exp + 2) * dot(rd, ffnormal) ) / ( (phong_exp + 1) * prob_spec );
-	}
+\medskip
 
-\end{lstlisting}
+La dirección del vector reflejado se calcula siguiendo el procedimiento explicado en la sección \ref{muestreo_brdf}. En caso de que el coseno entre la normal de la superficie y el vector resultado del muestreo sea inferior a 0, omitiremos este vector y asumiremos que su contribución de luz es nula. En caso contrario se traza el rayo, se evalúa la BRDF y se aplica la ponderación por muestreo de importancia.
 
-La función \emph{sample\_specular2} genera una dirección aleatoria con una densidad de probabilidad que depende del exponente especular, tal como hemos visto en la sección \ref{muestreo_brdf}.
 
 \begin{figure}
 \centering
@@ -285,41 +235,13 @@ La función \emph{sample\_specular2} genera una dirección aleatoria con una den
 
 Una mejora importante que hemos implementado ha sido el muestreo directo de fuentes de luz. Muestrear las luces directamente provoca que el renderizado converja más rápido al lanzar rayos hacia zonas de la escena que es más probable que aporten luz al cómputo final.
 
-\begin{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics[width=3in]{light_sampling.png}
+\caption{Muestreo de luz directa}
+\end{figure}
 
-for(int i = 0; i < spherical_lights.size(); ++i){
-	float3 light_dir = spherical_lights[i].center - hit;
-	float dist2 = dot(light_dir, light_dir);
-	float radius2 = spherical_lights[i].radius * spherical_lights[i].radius;
-	if(dist2 - radius2 < scene_epsilon){
-		continue;
-	}
-	unsigned int seed = prd_radiance.seed;
-	float cos_theta_max = sqrtf(1 - radius2/dist2);
-	float inv_pdf = 2.0f * PI * (1.0f - cos_theta_max);
-	
-	float r1 = rnd(seed);
-	float r2 = rnd(seed);
-	float cos_theta = 1 + r1 * (cos_theta_max - 1);
-	float sin2theta = 1 - cos_theta * cos_theta;
-	float sin_theta = sqrtf(sin2theta);
-	float sin_phi = sinf(2 * PI * r2);
-	float cos_phi = cosf(2 * PI * r2);
-	float3 w = normalize(light_dir);
-	float3 u, v;
-	createONB(w, u, v);
-	float3 dir = normalize( u * cos_phi * sin_theta + v * sin_phi * sin_theta + w * cos_theta );
-
-	if(dot(dir, ffnormal) < 0) continue;
-	PerRayData_shadow shadow_prd;
-	shadow_prd.contribution = spherical_lights[i].emission;
-	float delta = sqrtf(radius2 - sin2theta * dist2);
-	Ray shadow_ray = Ray( hit, dir, shadow_ray_type, scene_epsilon, cos_theta * length(light_dir) - delta );
-	rtTrace(top_object, shadow_ray, shadow_prd);
-	color += inv_pdf * shadow_prd.contribution * dot(dir, ffnormal) * (Kd + Ks * powf(fmaxf(dot(dir, perfect_specular), 0.0f), phong_exp) );
-
-}
-\end{lstlisting}
+\clearpage
 
 Para cada luz esférica calculamos la distancia del punto que estamos evaluando al centro de la esfera y en caso de encontrarnos dentro de la misma la omitimos y continuamos con la siguiente.
 

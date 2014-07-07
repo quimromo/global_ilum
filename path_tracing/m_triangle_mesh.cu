@@ -73,9 +73,11 @@ RT_PROGRAM void mesh_intersect( int primIdx )
       }
       geometric_normal = normalize( n );
       int3 t_idx = tindex_buffer[ primIdx ];
-	     tangent = make_float3(0.0, 0.0, 0.0);
+	  /*
+	  tangent = make_float3(0.0, 0.0, 0.0);
 	  bi_tangent = make_float3(0.0, 0.0, 0.0);
-      if ( texcoord_buffer.size() == 0 || t_idx.x < 0 || t_idx.y < 0 || t_idx.z < 0 ) {
+      */
+	  if ( texcoord_buffer.size() == 0 || t_idx.x < 0 || t_idx.y < 0 || t_idx.z < 0 ) {
         texcoord = make_float3( 0.0f, 0.0f, 0.0f );
       } else {
         float2 t0 = texcoord_buffer[ t_idx.x ];
@@ -83,6 +85,7 @@ RT_PROGRAM void mesh_intersect( int primIdx )
         float2 t2 = texcoord_buffer[ t_idx.z ];
         texcoord = make_float3( t1*beta + t2*gamma + t0*(1.0f-beta-gamma) );
 		//texcoord = make_float3(0.0f);
+		/*
 		if(useBump){
 			rtPrintf("calculating tangent");
 			float3 deltaPos1 = p0 - p1;
@@ -93,6 +96,7 @@ RT_PROGRAM void mesh_intersect( int primIdx )
 			   tangent = (deltaPos1 * deltaUV2.y   - deltaPos2 * deltaUV1.y)*r;
 			bi_tangent = (deltaPos2 * deltaUV1.x   - deltaPos1 * deltaUV2.x)*r;
 		}
+		*/
       }
 
       rtReportIntersection(material_buffer[primIdx]);

@@ -1,0 +1,41 @@
+<scene version="0.5.0">
+
+	<integrator type="path">
+		<!-- Path trace with a max. path length of 8 -->
+		<integer name="maxDepth" value="8"/>
+		<integer name="rrDepth" value="1"/>
+	</integrator>
+	<sensor type="perspective">
+		<!-- Rotate the camera around the Y axis by 180 degrees -->
+		<transform name="toWorld">
+			<lookat origin="8.9218, 9.7495, 1.0665" target="8.0, 9.5, 0.7" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="70.0"/>
+		<string name="fovAxis" value="y"/>
+		
+		<sampler type="independent">
+			<integer name="sampleCount" value="225"/>
+		</sampler>
+		<!-- Generate an EXR image at HD resolution -->
+		<film type="ldrfilm">
+			<integer name="width" value="1024"/>
+			<integer name="height" value="768"/>
+		</film>
+	</sensor>
+
+	<shape type="obj">
+		<string name="filename" value="../dabrovic-sponza/sponza.obj"/>
+	</shape>
+
+	
+	<shape type="sphere">
+		<point name="center" x="-5.0" y="7.0" z="4.3"/>
+		<float name="radius" value="1.0"/>
+		<emitter type="area">
+			<spectrum name="radiance" value="1"/>
+		</emitter>
+	</shape>
+	
+
+</scene>
+
